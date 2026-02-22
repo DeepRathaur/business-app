@@ -39,8 +39,8 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       isPassword && showPasswordToggle ? (showPass ? "text" : "password") : type;
 
     const labelClass = isLight
-      ? "text-neutral-800 font-medium"
-      : "text-white/90 font-medium";
+      ? "text-gray-800 font-semibold"
+      : "text-gray-800 font-semibold";
 
     const inputClass = `
       mt-2 w-full bg-transparent border-b border-gray-300 focus:border-gray-500 outline-none p-2 text-gray-800 placeholder:text-gray-400
@@ -57,7 +57,11 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             className={`block text-sm mb-2 ${labelClass}`}
           >
             {label}
+
+            <span className="ml-1 text-red-600">*</span>
+            
           </label>
+          
         )}
         <div className="relative">
           <input
@@ -78,7 +82,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             <button
               type="button"
               onClick={() => setShowPass((p) => !p)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 p-1"
+              className="absolute right-1 top-[60%] -translate-y-1/2 text-neutral-500 hover:text-neutral-700 p-1"
               aria-label={showPass ? "Hide password" : "Show password"}
             >
               {showPass ? (

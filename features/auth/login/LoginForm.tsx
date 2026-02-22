@@ -64,9 +64,12 @@ export default function LoginForm({
         />
         <Link
           href="/forgot-password"
-          className="text-sm text-blue-600 hover:text-blue-700 text-right -mt-2"
+          className="text-right text-xs text-[#2286FF]"
         >
-          {t("USER_LOGIN.FORGOT_PASSWORD")}
+          <span className="text-right w-full block">
+                {t("USER_LOGIN.FORGOT_PASSWORD")}
+          </span>
+          
         </Link>
         <PrimaryButton
           type="submit"

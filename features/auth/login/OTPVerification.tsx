@@ -41,7 +41,7 @@ export default function OTPVerification({
 
   return (
     <>
-      <div className="sticky z-[100] p-4 w-full">
+      <div className="sticky z-[100] w-full">
         <button
           type="button"
           onClick={onBack}
@@ -66,14 +66,17 @@ export default function OTPVerification({
         </button>
       </div>
 
-      <div className="mt-6 text-center">
-        <h1 className="text-sm font-semibold text-gray-800">
-          OTP Verification
-        </h1>
-        <p className="mt-2 text-sm text-gray-600" id="otp-sent-hint">
-          {t("USER_LOGIN.OTP_SENT_TO")}{masked}
-        </p>
-      </div>
+      <section>
+        <div className="mt-6 text-center">
+          <h1 className="text-sm font-semibold text-gray-800 max-[320px]:text-[16px]">
+            OTP Verification
+          </h1>
+          <p className="mt-2 text-sm text-gray-600 max-[320px]:text-[13px] max-[300px]:text-[12px]">
+            {t("USER_LOGIN.OTP_SENT_TO")}{masked}
+          </p>
+        </div>
+      </section>
+
 
       <CustomOtpBoxes
         timer={otpExpiryMinutes}
@@ -88,7 +91,7 @@ export default function OTPVerification({
         </p>
       )}
 
-      <div className="px-5 mt-5">
+      <div className="mt-5">
         <PrimaryButton
           fullWidth
           loading={loading}

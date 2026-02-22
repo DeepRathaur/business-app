@@ -11,7 +11,7 @@ export interface LoginRequest {
 
 /** Login response - API returns secretKey for OTP flow */
 export interface LoginResponse {
-  statusCode: string;
+  statusCode: number;
   message?: string;
   result?: {
     secretKey?: string;
@@ -28,7 +28,7 @@ export interface SendOtpRequest {
 
 /** Send OTP / Resend OTP response */
 export interface SendOtpResponse {
-  statusCode: string;
+  statusCode: number;
   message?: string;
   result?: {
     otpId?: string;
@@ -52,7 +52,7 @@ export interface ResendOtpRequest {
 
 /** Verify OTP response - contains access token */
 export interface VerifyOtpResponse {
-  statusCode: string;
+  statusCode: number;
   message?: string;
   result?: {
     accessToken?: string;

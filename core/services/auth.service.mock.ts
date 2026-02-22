@@ -2,6 +2,11 @@
  * Mock Auth Service - For development when no backend is available
  * Simulates Project B login flow: login → send OTP → verify OTP → token
  * Enable via NEXT_PUBLIC_MOCK_AUTH=true
+ *
+ * Real API logic (login URL/body, sendOtp, resendOtp, verifyOtp) lives in auth.service.ts:
+ * - Login: encrypted → ENTERPRISE_BACKEND_LOGIN; UMS2 → UMS2_LOGIN; else LOGIN
+ * - Send OTP / Resend: UMS2_SEND_OTP vs SEND_OTP, UMS2 resend vs RE_SEND_OTP
+ * - Verify OTP: UMS2_VERIFY_LOGIN_OTP vs VERIFY_LOGIN_OTP
  */
 
 import type {
@@ -14,6 +19,7 @@ import type {
   ResendOtpRequest,
 } from "@/core/models/auth.models";
 import { ResponseCode } from "@/core/models/auth.models";
+import { ResponseCodeEnum } from "../enum/response-code.enum";
 
 const MOCK_SECRET = "mock-secret-key";
 const MOCK_OTP = "123456";
@@ -22,13 +28,16 @@ const MOCK_TOKEN = "Bearer mock-jwt-token-" + Date.now();
 export class AuthServiceMock {
   private otpStore: Map<string, { otpId: string }> = new Map();
 
+  /** Mirrors real login flow (auth.service): encrypted vs UMS2 vs standard; returns secretKey for OTP step */
   async login(
     input: LoginRequest | { record: string },
     _options?: { isEncrypted?: boolean; enableUms2?: boolean }
   ): Promise<LoginResponse> {
+
+    console.log("Mock login called with:", input);
     await delay(500);
     return {
-      statusCode: ResponseCode.LOGIN_SUCCESS,
+      statusCode: ResponseCodeEnum.LOGIN_SUCCESS,
       message: "Login successful",
       result: { secretKey: MOCK_SECRET },
     };
@@ -42,7 +51,7 @@ export class AuthServiceMock {
     const otpId = `otp-${Date.now()}`;
     this.otpStore.set(input.username, { otpId });
     return {
-      statusCode: ResponseCode.SUCCESS,
+      statusCode: ResponseCodeEnum.SUCCESS,
       message: "OTP sent successfully",
       result: { otpId },
     };
@@ -55,7 +64,7 @@ export class AuthServiceMock {
     await delay(400);
     if (input.otp === MOCK_OTP || input.otp.length === 6) {
       return {
-        statusCode: ResponseCode.SUCCESS,
+        statusCode: ResponseCodeEnum.SUCCESS,
         message: "OTP verified",
         result: {
           accessToken: `mock-jwt-token-${Date.now()}`,
@@ -64,7 +73,7 @@ export class AuthServiceMock {
       };
     }
     return {
-      statusCode: ResponseCode.INVALID_OTP,
+      statusCode: ResponseCodeEnum.INVALID_OTP,
       message: "Invalid OTP",
     };
   }
@@ -77,7 +86,7 @@ export class AuthServiceMock {
     const otpId = `otp-${Date.now()}`;
     this.otpStore.set(input.username, { otpId });
     return {
-      statusCode: ResponseCode.SUCCESS,
+      statusCode: ResponseCodeEnum.SUCCESS,
       message: "OTP resent",
       result: { otpId },
     };

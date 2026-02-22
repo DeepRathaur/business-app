@@ -35,27 +35,33 @@ export class AuthService {
     return override ?? this.config.enableUms2 ?? getGlobalConfig().enableUms2;
   }
 
-  private get loginUrl(): string {
-    return this.getEnableUms2() ? API_ENDPOINTS.UMS2_LOGIN : API_ENDPOINTS.LOGIN;
-  }
-
   private getUrl(overrideUms2: boolean | undefined, ums2Path: string, stdPath: string): string {
     return this.getEnableUms2(overrideUms2) ? ums2Path : stdPath;
   }
 
+  /**
+   * Login - actual API call.
+   * URL: encrypted → ENTERPRISE_BACKEND_LOGIN; UMS2 → UMS2_LOGIN; else LOGIN.
+   * Body: encrypted → { record }; else → { username, password }.
+   */
   async login(
     input: LoginRequest | { record: string },
     options?: { isEncrypted?: boolean; enableUms2?: boolean }
   ): Promise<LoginResponse> {
+    const isEncrypted = options?.isEncrypted && "record" in input;
     const enableUms2 = this.getEnableUms2(options?.enableUms2);
-    const url = this.getUrl(options?.enableUms2, API_ENDPOINTS.UMS2_LOGIN, API_ENDPOINTS.LOGIN);
-    const body =
-      options?.isEncrypted && "record" in input
-        ? input
-        : {
-            username: (input as LoginRequest).username.toLowerCase().trim(),
-            password: (input as LoginRequest).password,
-          };
+
+    const url = isEncrypted
+      ? API_ENDPOINTS.ENTERPRISE_BACKEND_LOGIN
+      : this.getUrl(options?.enableUms2, API_ENDPOINTS.UMS2_LOGIN, API_ENDPOINTS.LOGIN);
+
+    const body = isEncrypted
+      ? { record: (input as { record: string }).record }
+      : {
+          username: (input as LoginRequest).username.toLowerCase().trim(),
+          password: (input as LoginRequest).password,
+        };
+
     return httpClient<LoginResponse>(url, {
       method: "POST",
       body,

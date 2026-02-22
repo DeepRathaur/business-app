@@ -110,7 +110,7 @@ export default function CustomOtpBoxes({
   }, [timer, startTimer]);
 
   return (
-    <div className="mt-4 px-4" role="group" aria-labelledby="otp-sent-hint">
+    <div className="mt-4" role="group" aria-labelledby="otp-sent-hint">
       <div
         className="flex w-full flex-nowrap justify-between gap-2 max-[385px]:gap-1"
         role="group"
@@ -141,7 +141,7 @@ export default function CustomOtpBoxes({
         ))}
       </div>
 
-      <div className="mt-2 flex items-center justify-between text-sm gap-4">
+      <div className="mt-2 flex items-center justify-end text-sm gap-4">
         <span className="text-[#1F2436]">
           {remSeconds !== null && remSeconds > 0 ? (
             <span className="text-xs" aria-live="polite">

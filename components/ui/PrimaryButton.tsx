@@ -1,60 +1,38 @@
 "use client";
 
 import { type ButtonHTMLAttributes } from "react";
+import { cn } from "@/lib/utils/cn";
 
-/**
- * PrimaryButton - Primary CTA button
- * Min 44px height for touch targets (WCAG)
- * Variants for different contexts
- */
 interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "outline" | "ghost";
-  size?: "sm" | "md" | "lg";
-  fullWidth?: boolean;
   loading?: boolean;
+  /** @deprecated no longer used; kept for backward compatibility */
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  /** @deprecated no longer used; kept for backward compatibility */
+  size?: "sm" | "md" | "lg";
+  /** @deprecated no longer used; kept for backward compatibility */
+  fullWidth?: boolean;
 }
 
 export default function PrimaryButton({
   children,
-  variant = "primary",
-  size = "md",
-  fullWidth = true,
   loading = false,
   disabled,
-  className = "",
+  className,
+  variant,
+  size,
+  fullWidth,
   ...props
 }: PrimaryButtonProps) {
-  const baseClasses =
-    "mt-5 w-full rounded-md bg-[#141a2a] text-white py-3 text-sm font-medium hover:opacity-95 inline-flex items-center justify-center font-semibold rounded-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
-
-  const variants = {
-    primary:
-      " text-primary hover:bg-red-500/95 shadow-card",
-    secondary:
-      "bg-white/20 text-white border border-white/30 hover:bg-red-500/30",
-    outline:
-      "bg-transparent text-white border-2 border-white hover:bg-red-500/10",
-    ghost: "bg-transparent text-white hover:bg-red-500/10",
-  };
-
-  const sizes = {
-    sm: "h-10 px-4 text-sm",
-    md: "text-base min-h-[44px]",
-    lg: "h-14 px-8 text-lg min-h-[48px]",
-  };
-
   return (
     <button
       type="button"
-      disabled={disabled || loading}
-      className={`
-        ${baseClasses}
-        ${variants[variant]}
-        ${sizes[size]}
-        ${fullWidth ? "w-full" : ""}
-        ${className}
-      `}
+      disabled={disabled ?? loading}
+      className={cn(
+        "w-[100%] text-sm flex justify-center button mt-6 mb-6",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
+        className
+      )}
       {...props}
     >
       {loading ? (

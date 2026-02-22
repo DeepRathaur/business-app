@@ -7,6 +7,8 @@ import { UserUrls } from "@/core/constants/api-urls";
 
 export const API_ENDPOINTS = {
   LOGIN: UserUrls.LOGIN,
+  /** Encrypted login (record payload) */
+  ENTERPRISE_BACKEND_LOGIN: UserUrls.ENTERPRISE_BACKEND_LOGIN,
   SEND_OTP: UserUrls.SEND_OTP,
   VERIFY_OTP: UserUrls.VERIFY_LOGIN_OTP,
   RESEND_OTP: UserUrls.RE_SEND_OTP,

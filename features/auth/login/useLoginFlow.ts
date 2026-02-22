@@ -11,6 +11,7 @@ import { useConfig } from "@/context/ConfigContext";
 import { useLayout } from "@/context/LayoutContext";
 import { ResponseCode } from "@/core/models/auth.models";
 import type { OtpEvent } from "./CustomOtpBoxes";
+import { ResponseCodeEnum } from "@/core/enum/response-code.enum";
 
 const DEFAULT_OTP_LENGTH = 6;
 const DEFAULT_OTP_EXPIRY_MINUTES = 1;
@@ -106,10 +107,11 @@ export function useLoginFlow() {
           },
           { enableUms2: isEnableUms2 }
         );
-        if (sendRes.statusCode === ResponseCode.SUCCESS) {
+        if (sendRes && sendRes.statusCode === ResponseCodeEnum.SUCCESS) {
           setOtpId(sendRes.result?.otpId ?? "");
           setOtpStep(true);
           setHideHeader(true);
+          console.log(sendRes);
           showToast(sendRes.message ?? t("message_constant.OTP_SENT_SUCCESS"), "success");
         } else {
           showToast(sendRes.message ?? t("message_constant.SOMETHING_WENT_WRONG"), "error");
@@ -128,7 +130,6 @@ export function useLoginFlow() {
 
   const performLogin = useCallback(
     async (input: { username: string; password: string } | string) => {
-      
       setLoading(true);
       clearErrors();
       try {
@@ -139,31 +140,30 @@ export function useLoginFlow() {
                 username: input.username.toLowerCase().trim(),
                 password: input.password,
               };
-
         const res = await authService.login(body as { username: string; password: string } | { record: string }, {
           isEncrypted: typeof input === "string",
           enableUms2: isEnableUms2,
         });
 
         const code = res.statusCode;
-
-        if (code === ResponseCode.LOGIN_SUCCESS || code === ResponseCode.UMS2_LOGIN_SUCCESS) {
+        console.log(code, res);
+        if (code === ResponseCodeEnum.LOGIN_SUCCESS || code === ResponseCodeEnum.UMS2_LOGIN_SUCCESS) {
           const key = res.result?.secretKey ?? "";
           setSecretKey(key);
           setErrors({});
           await sendOtp(key);
         } else if (
-          code === ResponseCode.INCORRECT_USERNAME_PASSWORD ||
-          code === ResponseCode.INCORRECT_USERNAME
+          code === ResponseCodeEnum.INCORRECT_USERNAME_PASSWORD ||
+          code === ResponseCodeEnum.INCORRECT_USERNAME
         ) {
           setErrors({ password: res.message ?? t("message_constant.INCORRECT_USERNAME_PASSWORD") });
           showToast(res.message ?? t("message_constant.INCORRECT_USERNAME_PASSWORD"), "error");
         } else if (
-          code === ResponseCode.FAILED_TO_AUTHENTICATE ||
-          code === ResponseCode.AUTH_FAILED
+          code === ResponseCodeEnum.FAILED_TO_AUTHENTICATE ||
+          code === ResponseCodeEnum.AUTH_FAILED
         ) {
           showToast(res.message ?? t("message_constant.SOMETHING_WENT_WRONG"), "error");
-        } else if (code === ResponseCode.FAILE || code === ResponseCode.SECRET_KEY_USED) {
+        } else if (code === ResponseCodeEnum.FAILE || code === ResponseCodeEnum.SECRET_KEY_USED) {
           showToast(res.message ?? t("message_constant.SOMETHING_WENT_WRONG"), "error");
         } else {
           showToast(res.message ?? t("message_constant.SOMETHING_WENT_WRONG"), "error");
@@ -235,7 +235,7 @@ export function useLoginFlow() {
         enableUms2: isEnableUms2,
       });
 
-      if (res.statusCode === ResponseCode.SUCCESS) {
+      if (res.statusCode === ResponseCodeEnum.SUCCESS) {
         setOtpId(res.result?.otpId ?? otpId);
         showToast(t("message_constant.OTP_RESEND_SUCCESS"), "success");
       } else {
@@ -279,7 +279,7 @@ export function useLoginFlow() {
         { enableUms2: isEnableUms2 }
       );
 
-      if (res.statusCode === ResponseCode.SUCCESS) {
+      if (res.statusCode === ResponseCodeEnum.SUCCESS) {
         const token = authService.buildToken(res.result);
         if (token) {
           loginAuth(token);
@@ -290,12 +290,12 @@ export function useLoginFlow() {
           setErrors({ otp: t("message_constant.SOMETHING_WENT_WRONG") });
         }
       } else if (
-        res.statusCode === ResponseCode.INVALID_OTP ||
-        res.statusCode === ResponseCode.UMS2_INVALID_OTP ||
-        res.statusCode === ResponseCode.VERIFY_OTP_FAIL ||
-        res.statusCode === ResponseCode.UMS2_OTP_EXPIRED ||
-        res.statusCode === ResponseCode.SECRET_KEY_EXPIRED ||
-        res.statusCode === ResponseCode.UMS2_DOWNSTREAM_ISSUE
+        res.statusCode === ResponseCodeEnum.INVALID_OTP ||
+        res.statusCode === ResponseCodeEnum.UMS2_INVALID_OTP ||
+        res.statusCode === ResponseCodeEnum.VERIFY_OTP_FAIL ||
+        res.statusCode === ResponseCodeEnum.UMS2_OTP_EXPIRED ||
+        res.statusCode === ResponseCodeEnum.SECRET_KEY_EXPIRED ||
+        res.statusCode === ResponseCodeEnum.UMS2_DOWNSTREAM_ISSUE
       ) {
         showToast(res.message ?? t("message_constant.SOMETHING_WENT_WRONG"), "error");
         setErrors({ otp: res.message ?? t("message_constant.INVALID_OTP") });
