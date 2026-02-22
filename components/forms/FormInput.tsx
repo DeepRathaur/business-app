@@ -43,13 +43,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       : "text-white/90 font-medium";
 
     const inputClass = `
-      w-full min-h-[44px] px-1 py-3
-      text-base text-neutral-900 bg-transparent
-      border-0 border-b border-neutral-300
-      placeholder:text-neutral-400
-      focus:outline-none focus:ring-0 focus:border-primary focus:border-b-2
-      disabled:opacity-50 disabled:cursor-not-allowed
-      transition-colors
+      mt-2 w-full bg-transparent border-b border-gray-300 focus:border-gray-500 outline-none p-2 text-gray-800 placeholder:text-gray-400
       ${error ? "!border-red-500" : ""}
       ${showPasswordToggle && isPassword ? "pr-12" : ""}
       ${className}

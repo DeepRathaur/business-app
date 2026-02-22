@@ -15,4 +15,14 @@ export enum LocalStorageKey {
   LOGIN_TIME = "LOGIN_TIME",
   /** Feature flags / layout config - extend as needed */
   LAYOUT_CONF = "LAYOUT_CONF",
+  /** User email / auuid for fetch-permission */
+  AUU_NUMBERID = "AUU_NUMBERID",
+  /** User permissions */
+  UMS_PERMISSION = "UMS_PERMISSION",
+  /** Service type */
+  SERVICE_TYPE = "SERVICE_TYPE",
+  /** Enterprise role */
+  ENTERPRISE_ROLE = "ENTERPRISE_ROLE",
+  /** Transaction info for pay flow (outstanding amount, invoice, etc.) */
+  TXN_INFO = "TXN_INFO",
 }

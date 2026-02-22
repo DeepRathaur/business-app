@@ -20,6 +20,10 @@ export type AuthServiceConfig = {
   enableUms2?: boolean;
 };
 
+export type AuthCallOptions = {
+  enableUms2?: boolean;
+};
+
 export class AuthService {
   private config: AuthServiceConfig;
 
@@ -27,56 +31,59 @@ export class AuthService {
     this.config = config;
   }
 
-  private get enableUms2(): boolean {
-    return this.config.enableUms2 ?? getGlobalConfig().enableUms2;
+  private getEnableUms2(override?: boolean): boolean {
+    return override ?? this.config.enableUms2 ?? getGlobalConfig().enableUms2;
   }
 
   private get loginUrl(): string {
-    return this.enableUms2 ? API_ENDPOINTS.UMS2_LOGIN : API_ENDPOINTS.LOGIN;
+    return this.getEnableUms2() ? API_ENDPOINTS.UMS2_LOGIN : API_ENDPOINTS.LOGIN;
   }
 
-  private get sendOtpUrl(): string {
-    return this.enableUms2 ? API_ENDPOINTS.UMS2_SEND_OTP : API_ENDPOINTS.SEND_OTP;
+  private getUrl(overrideUms2: boolean | undefined, ums2Path: string, stdPath: string): string {
+    return this.getEnableUms2(overrideUms2) ? ums2Path : stdPath;
   }
 
-  private get verifyOtpUrl(): string {
-    return this.enableUms2 ? API_ENDPOINTS.UMS2_VERIFY_OTP : API_ENDPOINTS.VERIFY_OTP;
-  }
-
-  private get resendOtpUrl(): string {
-    return this.enableUms2 ? API_ENDPOINTS.UMS2_RESEND_OTP : API_ENDPOINTS.RESEND_OTP;
-  }
-
-  async login(input: LoginRequest): Promise<LoginResponse> {
-    const body = {
-      username: input.username.toLowerCase().trim(),
-      password: input.password,
-    };
-    return httpClient<LoginResponse>(this.loginUrl, {
+  async login(
+    input: LoginRequest | { record: string },
+    options?: { isEncrypted?: boolean; enableUms2?: boolean }
+  ): Promise<LoginResponse> {
+    const enableUms2 = this.getEnableUms2(options?.enableUms2);
+    const url = this.getUrl(options?.enableUms2, API_ENDPOINTS.UMS2_LOGIN, API_ENDPOINTS.LOGIN);
+    const body =
+      options?.isEncrypted && "record" in input
+        ? input
+        : {
+            username: (input as LoginRequest).username.toLowerCase().trim(),
+            password: (input as LoginRequest).password,
+          };
+    return httpClient<LoginResponse>(url, {
       method: "POST",
       body,
       skipAuth: true,
     });
   }
 
-  async sendOtp(input: SendOtpRequest): Promise<SendOtpResponse> {
-    return httpClient<SendOtpResponse>(this.sendOtpUrl, {
+  async sendOtp(input: SendOtpRequest, options?: AuthCallOptions): Promise<SendOtpResponse> {
+    const url = this.getUrl(options?.enableUms2, API_ENDPOINTS.UMS2_SEND_OTP, API_ENDPOINTS.SEND_OTP);
+    return httpClient<SendOtpResponse>(url, {
       method: "POST",
       body: input,
       skipAuth: true,
     });
   }
 
-  async verifyOtp(input: VerifyOtpRequest): Promise<VerifyOtpResponse> {
-    return httpClient<VerifyOtpResponse>(this.verifyOtpUrl, {
+  async verifyOtp(input: VerifyOtpRequest, options?: AuthCallOptions): Promise<VerifyOtpResponse> {
+    const url = this.getUrl(options?.enableUms2, API_ENDPOINTS.UMS2_VERIFY_OTP, API_ENDPOINTS.VERIFY_OTP);
+    return httpClient<VerifyOtpResponse>(url, {
       method: "POST",
       body: input,
       skipAuth: true,
     });
   }
 
-  async resendOtp(input: ResendOtpRequest): Promise<SendOtpResponse> {
-    return httpClient<SendOtpResponse>(this.resendOtpUrl, {
+  async resendOtp(input: ResendOtpRequest, options?: AuthCallOptions): Promise<SendOtpResponse> {
+    const url = this.getUrl(options?.enableUms2, API_ENDPOINTS.UMS2_RESEND_OTP, API_ENDPOINTS.RESEND_OTP);
+    return httpClient<SendOtpResponse>(url, {
       method: "POST",
       body: input,
       skipAuth: true,

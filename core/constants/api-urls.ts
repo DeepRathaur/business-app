@@ -20,3 +20,19 @@ export const ConfigurationUrls = {
   CONFIG: "epb/api/enterprise-portal-backend/resource/v1/configuration",
   LOCALE: "epb/api/enterprise-portal-backend/resource/v1/fetch-locale-labels",
 } as const;
+
+export const UserUrls_extended = {
+  FETCH_USER: "epb/api/enterprise-portal-backend/user/v1/fetch-user",
+  FETCH_USER_V2: "epb/api/enterprise-portal-backend/user/v2/fetch-user",
+  FETCH_UMS_DETAILS: "userm/api/user-mngmnt/users",
+  UMS2_FETCH_UMS_DETAILS: "uma/api/uma/user",
+} as const;
+
+/** Master data / account / billing APIs */
+export const MasterDataUrls = {
+  GET_ACCOUNT_DETAILS: "epb/api/enterprise-portal-backend/account/v1/load",
+  GET_BILL_SUMMARY: "epb/api/enterprise-portal-backend/account/v1/bill-summary",
+  GET_BANNER_CONFIGURATION: "epb/api/enterprise-portal-backend/resource/v1/banner-configuration",
+  GET_LINE_DETAILS: "epb/api/enterprise-portal-backend/line/v1/search",
+  GET_LINE_COUNT: "epb/api/enterprise-portal-backend/line/v1/line-count",
+} as const;

@@ -293,6 +293,11 @@ body {
 
 /* GLOBLE CLASSES  &&  TAILWIND UTILITY */
 
+/* Reusable auth/primary button - Pay Bill, Validate OTP, Login */
+@utility btn-auth-primary {
+  @apply w-full rounded-md bg-[#141a2a] text-white py-3 text-sm font-medium hover:opacity-95 transition min-h-[44px] flex items-center justify-center;
+}
+
 @utility form-label { @apply block text-sm  text-black mb-[5px]}
 @utility form-control { 
   @apply bg-white text-black block mb-0 w-full h-[40px] rounded-[3px] text-base border border-[#D6D6D6] px-3 py-2  focus:outline-none focus:ring-2 focus:ring-blue-500 

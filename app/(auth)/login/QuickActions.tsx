@@ -67,8 +67,7 @@ export default function QuickActions() {
           </div>
           <button
             type="button"
-            className="mt-5 w-full rounded-md bg-[#141a2a] text-white py-3 text-sm font-medium hover:opacity-95 transition"
-
+            className="mt-5 btn-auth-primary"
           >
             Pay Bill
           </button>

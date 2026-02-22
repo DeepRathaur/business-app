@@ -19,13 +19,21 @@ let instance: GlobalConfig | null = null;
 /**
  * Returns singleton config. Loads from env once.
  */
+const BFE_WEB = "/bfe/web";
+
 export function getGlobalConfig(): GlobalConfig {
   if (!instance) {
     const prefix = process.env.NEXT_PUBLIC_PROJECT_PREFIX ?? "";
     const customBase = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const base =
+    let base =
       customBase ??
-      (prefix ? `${prefix}/bfe/web` : "https://api.example.com");
+      (prefix ? `${prefix}${BFE_WEB}` : "https://api.example.com");
+
+    // Ensure /bfe/web is in the path (required for config/locale APIs)
+    if (!base.includes("/bfe/web")) {
+      base = base.replace(/\/?$/, "") + BFE_WEB;
+    }
+
     instance = {
       apiBaseUrl: base.endsWith("/") ? base.slice(0, -1) : base,
       defaultLanguage: process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?? "en",

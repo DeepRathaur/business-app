@@ -26,11 +26,11 @@ export default function PrimaryButton({
   ...props
 }: PrimaryButtonProps) {
   const baseClasses =
-    "mt-5 w-full rounded-md bg-[#141a2a] text-white py-3 text-sm font-medium hover:opacity-95 inline-flex items-center justify-center font-semibold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
+    "mt-5 w-full rounded-md bg-[#141a2a] text-white py-3 text-sm font-medium hover:opacity-95 inline-flex items-center justify-center font-semibold rounded-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
 
   const variants = {
     primary:
-      "bg-white text-primary hover:bg-white/95 shadow-card",
+      " text-primary hover:bg-white/95 shadow-card",
     secondary:
       "bg-white/20 text-white border border-white/30 hover:bg-white/30",
     outline:
@@ -40,7 +40,7 @@ export default function PrimaryButton({
 
   const sizes = {
     sm: "h-10 px-4 text-sm",
-    md: "h-12 px-6 text-base min-h-[44px]",
+    md: "text-base min-h-[44px]",
     lg: "h-14 px-8 text-lg min-h-[48px]",
   };
 

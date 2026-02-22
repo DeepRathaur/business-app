@@ -93,7 +93,7 @@ export default function OTPVerification({
           fullWidth
           loading={loading}
           onClick={onVerify}
-          className="!bg-charcoal hover:!bg-slate-900 !text-white"
+          className="btn-auth-primary"
         >
           {t("BUTTONS.LOGIN")}
         </PrimaryButton>

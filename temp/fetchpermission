@@ -1,0 +1,227 @@
+"use client";
+
+import { LoadingBar } from "@/components/loading-bars/LoadingBar";
+import { useAccount } from "@/context/AccountContext";
+import { useAuth } from "@/context/AuthContext";
+import { ConfigContext } from "@/context/ConfigContext";
+import { useToast } from "@/context/ToastProvider";
+import { accountService } from "@/core/service/accountService";
+import { useTranslate } from "@/hooks";
+import { useConfigurationLayout } from "@/hooks/useConfigurationLayout";
+import { useFeatureDetail } from "@/hooks/useFeatureDetail";
+import { getUMSPermission, getUserDetails } from "@/services/masterService";
+import Loader from "@/shared/components/Loader/Loader";
+import { message_constant } from "@/shared/constant/message.constant";
+import { ResponseCodeEnum } from "@/shared/enum";
+import { ToastType } from "@/shared/enum/toaster.enum";
+import { UMSPermissions } from "@/shared/enum/ums-user-status.enum";
+import {
+  Authority,
+  FetchUserResponseModel,
+  LayoutResponse,
+  Role,
+  Permission,
+  UMSDetailsResponseModel,
+  userPermission,
+} from "@/shared/models";
+import { Response, ResponseModel } from "@/shared/models/response.model";
+import BannerSliderSkeleton from "@/shared/skelton/BannerSliderSkeleton";
+import ManageServiceSkeleton from "@/shared/skelton/ManageServiceSkeleton";
+import TrackDetailsSkeleton from "@/shared/skelton/TrackDetailsSkeleton";
+import { useRouter } from "next/navigation";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+
+export default function FetchPermission() {
+  const [loadingS, setLoading] = useState(false);
+  const { token, setIsAuthed } = useAuth();
+  const [allowed, setAllowed] = useState(false);
+  const { fetchConfigurationLayout } = useConfigurationLayout();
+  const { getFeatureStatus } = useFeatureDetail();
+  const { config, loading, error } = useContext(ConfigContext);
+  const configuration = config?.result.public;
+  const t = useTranslate();
+  const [progress, setProgress] = useState(0);
+  const router = useRouter();
+  const { showToast } = useToast();
+  
+  const {
+      ecareaccounts,
+      selectedIndex,
+      select,
+      selected,
+      loadMore,
+      isLoadingMore,
+      hasMore,
+    } = useAccount();
+  const fetchUserDetails = async () => {
+    if (!configuration) {
+      console.warn("Configuration is not available yet.");
+      return;
+    }
+
+    try {
+      const isEnableUms2 = configuration?.OPCO_CONFIG.ENABLE_UMS_2;
+      const response: FetchUserResponseModel = await getUserDetails(isEnableUms2);
+      if (response.statusCode === ResponseCodeEnum.SUCCESS) {
+        const user_details = response.result;
+        accountService.setAuuid(user_details.email!);
+        accountService.setUser(user_details);
+        accountService.setPermission(response.result.userPermissions!);
+        accountService.setServiceType(response.result.serviceType!);
+        accountService.setEnterPriseRole(response.result.userType!);
+        setIsAuthed(true);
+        window.dispatchEvent(new Event("auth-changed"));
+        return response.result.userPermissions;
+      } else {
+        return response;
+      }
+    } catch (error) {
+
+    }
+  };
+
+  const mapUserPermissionWithLayout = async (layout: LayoutResponse | null) => {
+    const permission = accountService.getPermission();
+    const email = accountService.getAuuid() as string;
+    if (permission.length && layout) {
+      layout.service_request = layout.service_request?.map((item) => {
+        const currentArray = permission.find(
+          (category: userPermission) =>
+            category.categoryName === item.categoryName
+        );
+        if (currentArray) {
+          item.id = currentArray.categoryId;
+          item.categoryType = currentArray.parentType;
+          item.permission = currentArray.serviceName;
+          item.rank = currentArray.rank;
+          item.categoryId = currentArray.categoryId
+        }
+        item.featureEnable = getFeatureStatus(item.name, email);
+        return item;
+      });
+
+      layout.self_service = layout.self_service?.map((item) => {
+        const currentArray = permission.find((category: userPermission) => {
+          if (item.categoryType !== "GENERIC")
+            return category.categoryName === item.categoryName;
+          else return category.serviceName === item.permission;
+        });
+        if (currentArray) {
+          item.id = currentArray.categoryId;
+          item.categoryType = currentArray.parentType;
+          item.permission = currentArray.serviceName;
+          item.rank = currentArray.rank;
+        }
+        item.featureEnable = getFeatureStatus(item.name, email);
+        return item;
+      });
+      accountService.setConfigurationLayout(layout);
+    }
+  };
+
+  const fetchUMSPermission = async () => {
+    try {
+      const response: UMSDetailsResponseModel = await getUMSPermission(
+        configuration ? configuration?.OPCO_CONFIG.ENABLE_UMS_2 : true
+      );
+      if (response.statusCode === ResponseCodeEnum.SUCCESS) {
+        if (configuration && configuration.OPCO_CONFIG.ENABLE_UMS_2) {
+          await handleUMS2Permissions(response.result.authorities || []);
+        } else {
+          await handleLegacyPermissions(response.result.role || []);
+        }
+        return response.result;
+      }
+    } catch (error) {
+      console.error("Failed to fetch tour options:", error);
+    }
+  };
+
+  const handleUMS2Permissions = async (authorities: Authority[]) => {
+    const authorityNames = authorities.map((auth) => auth.authority);
+    //accountService.setUMSPermission(this._permissions, authorityNames);
+  };
+
+  const handleLegacyPermissions = async (roles: Role[]) => {
+    const permissionsArr: Permission[] = [];
+    const roleArr: string[] = roles.map((role) => {
+      if (role.permissions?.length) {
+        permissionsArr.push(
+          ...role.permissions.filter((permission) => permission.enabled)
+        );
+      }
+      return role.roleName;
+    });
+
+    const uniquePermissions = [
+      ...new Set(permissionsArr.map((item) => item.permissionName)),
+    ];
+    accountService.setUMSPermission(uniquePermissions as UMSPermissions[]);
+  };
+
+  const fetchUser = async () => {
+    try {
+      return await Promise.all([fetchUserDetails(), fetchUMSPermission()]);
+    } catch (error) {
+      console.error("Error loading initial data:", error);
+      throw error;
+    }
+  };
+
+  const loadConfiguration = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetchConfigurationLayout(
+        async () => {
+          setProgress(40);
+          const [userPermissions] = await fetchUser();
+          setProgress(70);
+          await mapUserPermissionWithLayout(response);
+          setProgress(100);
+          setLoading(false);
+          if((userPermissions as userPermission[]).length) {
+            router.push("/dashboard");
+          } else {
+            accountService.logOut();
+            router.push("/")
+            showToast((userPermissions as FetchUserResponseModel).message || message_constant.SOMETHING_WENT_WRONG, ToastType.error)
+          }
+          setAllowed(true);
+        },
+        () => {
+          console.log("❌ Configuration load failed");
+          setAllowed(false);
+          setProgress(100);
+        }
+      );
+      console.log("Fetched configuration layout:", response);
+    } catch (error) {
+      console.error("Unexpected error during configuration load:", error);
+      setAllowed(false);
+      setLoading(false);
+      setProgress(100);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadConfiguration();
+  }, [loadConfiguration]);
+
+  useEffect(() => {
+    if (!loading) {
+      setTimeout(() => setProgress(0), 500); // Smooth reset
+    }
+  }, [loading]);
+
+  return (
+    <>
+      {loadingS && (
+        <div className="">
+          <TrackDetailsSkeleton />
+          <ManageServiceSkeleton />
+          <BannerSliderSkeleton />
+        </div>
+      )}
+    </>
+  );
+}

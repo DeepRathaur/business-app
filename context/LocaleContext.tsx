@@ -13,6 +13,8 @@ import { LocalStorageKey } from "@/core/constants/localStorage.enum";
 import { getGlobalConfig } from "@/core/config/globalConfig";
 import { localStorageService } from "@/core/services/localStorage.service";
 import { fetchLocaleFromApi } from "@/core/services/language.service";
+import { useConfig } from "@/context/ConfigContext";
+import { staticLocales } from "@/lib/locales/static";
 
 type Translations = Record<string, unknown>;
 
@@ -26,12 +28,6 @@ interface LocaleContextValue {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-async function loadLocalJson(lang: string): Promise<Translations> {
-  const res = await fetch(`/locales/${lang}.json`);
-  if (!res.ok) return {};
-  return (await res.json()) as Translations;
-}
-
 function getNested(obj: unknown, path: string): string | null {
   const keys = path.split(".");
   let current: unknown = obj;
@@ -44,71 +40,78 @@ function getNested(obj: unknown, path: string): string | null {
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const config = getGlobalConfig();
+  const { loading: configLoading } = useConfig();
   const [currentLanguage, setCurrentLanguage] = useState<string>(config.defaultLanguage);
   const [translations, setTranslations] = useState<Translations | null>(null);
   const [loading, setLoading] = useState(true);
-  const [cache, setCache] = useState<Record<string, Translations>>({});
+  const [apiLoaded, setApiLoaded] = useState(false);
 
-  const loadLocal = useCallback(async (lang: string): Promise<Translations> => {
-    return loadLocalJson(lang === "fr" ? "fr" : "en");
-  }, []);
-
-  const loadTranslations = useCallback(
-    async (lang: string) => {
-      setLoading(true);
-      try {
-        const langToUse = lang || config.defaultLanguage;
-
-        const apiData = await fetchLocaleFromApi(langToUse);
-        let data: Translations;
-
-        if (apiData && typeof apiData === "object") {
-          data = apiData;
-          setCache((c) => ({ ...c, [langToUse]: data }));
-        } else {
-          data = (await loadLocal(langToUse)) ?? {};
-          setCache((c) => ({ ...c, [langToUse]: data }));
-        }
-
-        setTranslations(data);
-        setCurrentLanguage(langToUse);
-        localStorageService.set(LocalStorageKey.LANGUAGE, langToUse);
-      } catch {
-        const fallback = (await loadLocal(config.defaultLanguage)) ?? {};
-        setTranslations(fallback);
-        setCurrentLanguage(config.defaultLanguage);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [config.defaultLanguage, loadLocal]
+  const staticData = useMemo(
+    () => staticLocales[currentLanguage] ?? staticLocales.en ?? {},
+    [currentLanguage]
   );
+
+  const displayTranslations = apiLoaded ? translations : staticData;
+  const localeLoading = configLoading || loading;
+
+  const loadTranslationsFromApi = useCallback(async (lang: string) => {
+    if (configLoading) return;
+    setLoading(true);
+    try {
+      const langToUse = lang || config.defaultLanguage;
+      const apiData = await fetchLocaleFromApi(langToUse);
+      if (apiData && typeof apiData === "object") {
+        setTranslations(apiData);
+        setApiLoaded(true);
+      } else {
+        const fallback = staticLocales[langToUse] ?? staticLocales.en ?? {};
+        setTranslations(fallback);
+        setApiLoaded(true);
+      }
+      setCurrentLanguage(langToUse);
+      localStorageService.set(LocalStorageKey.LANGUAGE, langToUse);
+    } catch {
+      const fallback = staticLocales[config.defaultLanguage] ?? staticLocales.en ?? {};
+      setTranslations(fallback);
+      setApiLoaded(true);
+      setCurrentLanguage(config.defaultLanguage);
+    } finally {
+      setLoading(false);
+    }
+  }, [config.defaultLanguage, configLoading]);
 
   const t = useCallback(
     (key: string): string => {
-      if (!translations) return key;
-      const val = getNested(translations, key);
+      const data = displayTranslations;
+      if (!data || typeof data !== "object") return key;
+      const val = getNested(data, key);
       return val ?? key;
     },
-    [translations]
+    [displayTranslations]
   );
 
   const changeLanguage = useCallback(
     (lang: string) => {
       localStorageService.set(LocalStorageKey.LANGUAGE, lang);
-      loadTranslations(lang);
+      setCurrentLanguage(lang);
+      setTranslations(staticLocales[lang] ?? staticLocales.en ?? {});
+      loadTranslationsFromApi(lang);
     },
-    [loadTranslations]
+    [loadTranslationsFromApi]
   );
 
   useEffect(() => {
+    if (configLoading) return;
     const stored = localStorageService.get<string>(LocalStorageKey.LANGUAGE);
-    loadTranslations(stored ?? config.defaultLanguage);
-  }, [config.defaultLanguage, loadTranslations]);
+    const langToUse = stored ?? config.defaultLanguage;
+    setCurrentLanguage(langToUse);
+    setTranslations(staticLocales[langToUse] ?? staticLocales.en ?? {});
+    loadTranslationsFromApi(langToUse);
+  }, [configLoading, config.defaultLanguage, loadTranslationsFromApi]);
 
   const value = useMemo(
-    () => ({ t, changeLanguage, currentLanguage, translations, loading }),
-    [t, changeLanguage, currentLanguage, translations, loading]
+    () => ({ t, changeLanguage, currentLanguage, translations: displayTranslations, loading: localeLoading }),
+    [t, changeLanguage, currentLanguage, displayTranslations, localeLoading]
   );
 
   return (

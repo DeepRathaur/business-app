@@ -71,7 +71,7 @@ export default function LoginForm({
         <PrimaryButton
           type="submit"
           loading={loading}
-          className="!bg-charcoal hover:!bg-slate-900 !text-white"
+          className="btn-auth-primary"
         >
           {t("BUTTONS.VALIDATE_GET_OTP")}
         </PrimaryButton>

@@ -18,7 +18,7 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const showBottomNav =
-    pathname === "/dashboard" || pathname === "/manage-users";
+    pathname === "/dashboard" || pathname === "/manage-users" || pathname === "/services";
 
   return (
     <MobileContainer scroll>

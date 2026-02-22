@@ -11,8 +11,10 @@ interface AppHeaderProps {
   title: string;
   /** Back button links to this path */
   backHref?: string;
-  /** Use router.back() instead of link (for Support/PayBill from login) */
+  /** Use router.back() or onBack (for Services, Support, etc.) */
   useRouterBack?: boolean;
+  /** Custom back handler (overrides router.back when useRouterBack) */
+  onBack?: () => void;
   /** Optional right-side action */
   rightAction?: React.ReactNode;
 }
@@ -21,10 +23,12 @@ export default function AppHeader({
   title,
   backHref,
   useRouterBack,
+  onBack,
   rightAction,
 }: AppHeaderProps) {
   const router = useRouter();
   const showBack = backHref ?? useRouterBack;
+  const handleBack = onBack ?? (() => router.back());
 
   return (
     <header className="flex items-center justify-between h-14 px-4 shrink-0">
@@ -33,7 +37,7 @@ export default function AppHeader({
           useRouterBack ? (
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={handleBack}
               className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-white hover:bg-white/10 active:bg-white/20 transition-colors"
               aria-label="Go back"
             >

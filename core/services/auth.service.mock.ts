@@ -22,7 +22,10 @@ const MOCK_TOKEN = "Bearer mock-jwt-token-" + Date.now();
 export class AuthServiceMock {
   private otpStore: Map<string, { otpId: string }> = new Map();
 
-  async login(input: LoginRequest): Promise<LoginResponse> {
+  async login(
+    input: LoginRequest | { record: string },
+    _options?: { isEncrypted?: boolean; enableUms2?: boolean }
+  ): Promise<LoginResponse> {
     await delay(500);
     return {
       statusCode: ResponseCode.LOGIN_SUCCESS,
@@ -31,7 +34,10 @@ export class AuthServiceMock {
     };
   }
 
-  async sendOtp(input: SendOtpRequest): Promise<SendOtpResponse> {
+  async sendOtp(
+    input: SendOtpRequest,
+    _options?: { enableUms2?: boolean }
+  ): Promise<SendOtpResponse> {
     await delay(400);
     const otpId = `otp-${Date.now()}`;
     this.otpStore.set(input.username, { otpId });
@@ -42,7 +48,10 @@ export class AuthServiceMock {
     };
   }
 
-  async verifyOtp(input: VerifyOtpRequest): Promise<VerifyOtpResponse> {
+  async verifyOtp(
+    input: VerifyOtpRequest,
+    _options?: { enableUms2?: boolean }
+  ): Promise<VerifyOtpResponse> {
     await delay(400);
     if (input.otp === MOCK_OTP || input.otp.length === 6) {
       return {
@@ -60,7 +69,10 @@ export class AuthServiceMock {
     };
   }
 
-  async resendOtp(input: ResendOtpRequest): Promise<SendOtpResponse> {
+  async resendOtp(
+    input: ResendOtpRequest,
+    _options?: { enableUms2?: boolean }
+  ): Promise<SendOtpResponse> {
     await delay(400);
     const otpId = `otp-${Date.now()}`;
     this.otpStore.set(input.username, { otpId });

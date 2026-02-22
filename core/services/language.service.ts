@@ -1,10 +1,10 @@
 /**
  * Language Service - Fetch translations from API with fallback to local JSON
- * No UI logic. Used by LocaleContext.
+ * Uses LanguageService (POST via axiosClient). Used by LocaleContext.
  */
 
-import { getGlobalConfig } from "@/core/config/globalConfig";
-import { ConfigurationUrls } from "@/core/constants/api-urls";
+import { LanguageService } from "./LanguageService";
+import { ResponseCodeEnum } from "@/shared/enum";
 
 export interface LocaleApiResponse {
   statusCode?: string;
@@ -12,30 +12,18 @@ export interface LocaleApiResponse {
   message?: string;
 }
 
-function buildUrl(path: string, query?: string): string {
-  const config = getGlobalConfig();
-  const base = config.apiBaseUrl.replace(/\/$/, "");
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${base}${cleanPath}`;
-  return query ? `${url}?${query}` : url;
-}
-
 /**
- * Fetch locale from API. Returns null on failure (caller should fallback to local).
+ * Fetch locale from API via POST (axiosClient + interceptor).
+ * Returns null on failure (caller should fallback to local).
  */
 export async function fetchLocaleFromApi(
   lang: string
 ): Promise<Record<string, unknown> | null> {
   try {
-    const query = new URLSearchParams({
-      locale: lang,
-      key: process.env.NEXT_PUBLIC_LOCALE_KEY ?? "frontend_locale_labels_test",
-    }).toString();
-    const url = buildUrl(ConfigurationUrls.LOCALE, query);
-    const res = await fetch(url);
-    const json = (await res.json()) as LocaleApiResponse;
-    if (json?.statusCode === "SUCCESS" && json?.result?.data) {
-      return json.result.data as Record<string, unknown>;
+    const service = new LanguageService();
+    const response = (await service.fetchLocale(lang)) as LocaleApiResponse;
+    if (response?.statusCode === ResponseCodeEnum.SUCCESS && response?.result?.data) {
+      return response.result.data as Record<string, unknown>;
     }
     return null;
   } catch {

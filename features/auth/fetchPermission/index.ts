@@ -1,0 +1,1 @@
+export { useFetchPermission } from "./useFetchPermission";
