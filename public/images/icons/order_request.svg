@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="104" height="138" viewBox="0 0 104 138">
+  <defs>
+    <clipPath id="clip-path">
+      <rect width="64.629" height="92.697" fill="none"/>
+    </clipPath>
+  </defs>
+  <g id="Group_160632" data-name="Group 160632" transform="translate(-1218 -363.947)">
+    <g id="Rectangle_18344" data-name="Rectangle 18344" transform="translate(1218 363.947)" fill="none" stroke="#ed1c24" stroke-width="1.5">
+      <rect width="104" height="138" rx="4" stroke="none"/>
+      <rect x="0.75" y="0.75" width="102.5" height="136.5" rx="3.25" fill="none"/>
+    </g>
+    <g id="Repeat_Grid_58" data-name="Repeat Grid 58" transform="translate(1237.192 385.191)" clip-path="url(#clip-path)">
+      <g transform="translate(-1228 -372.938)">
+        <line id="Line_472" data-name="Line 472" x1="40" transform="translate(1249.5 377.5)" fill="none" stroke="#ed1c24" stroke-linecap="round" stroke-width="2"/>
+        <path id="Icon_ionic-md-checkmark" data-name="Icon ionic-md-checkmark" d="M8.322,14.919,5.5,12.093l-1,.953,3.822,3.814L16.5,8.688l-1-.953Z" transform="translate(1223.5 365.203)" fill="#ed1c24" stroke="#ed1c26" stroke-width="0.2"/>
+      </g>
+      <g transform="translate(-1228 -356.938)">
+        <line id="Line_472-2" data-name="Line 472" x1="40" transform="translate(1249.5 377.5)" fill="none" stroke="#ed1c24" stroke-linecap="round" stroke-width="2"/>
+        <path id="Icon_ionic-md-checkmark-2" data-name="Icon ionic-md-checkmark" d="M8.322,14.919,5.5,12.093l-1,.953,3.822,3.814L16.5,8.688l-1-.953Z" transform="translate(1223.5 365.203)" fill="#ed1c24" stroke="#ed1c26" stroke-width="0.2"/>
+      </g>
+      <g transform="translate(-1228 -340.938)">
+        <line id="Line_472-3" data-name="Line 472" x1="40" transform="translate(1249.5 377.5)" fill="none" stroke="#ed1c24" stroke-linecap="round" stroke-width="2"/>
+        <path id="Icon_ionic-md-checkmark-3" data-name="Icon ionic-md-checkmark" d="M8.322,14.919,5.5,12.093l-1,.953,3.822,3.814L16.5,8.688l-1-.953Z" transform="translate(1223.5 365.203)" fill="#ed1c24" stroke="#ed1c26" stroke-width="0.2"/>
+      </g>
+      <g transform="translate(-1228 -324.938)">
+        <line id="Line_472-4" data-name="Line 472" x1="40" transform="translate(1249.5 377.5)" fill="none" stroke="#ed1c24" stroke-linecap="round" stroke-width="2"/>
+        <path id="Icon_ionic-md-checkmark-4" data-name="Icon ionic-md-checkmark" d="M8.322,14.919,5.5,12.093l-1,.953,3.822,3.814L16.5,8.688l-1-.953Z" transform="translate(1223.5 365.203)" fill="#ed1c24" stroke="#ed1c26" stroke-width="0.2"/>
+      </g>
+      <g transform="translate(-1228 -308.938)">
+        <line id="Line_472-5" data-name="Line 472" x1="40" transform="translate(1249.5 377.5)" fill="none" stroke="#ed1c24" stroke-linecap="round" stroke-width="2"/>
+        <path id="Icon_ionic-md-checkmark-5" data-name="Icon ionic-md-checkmark" d="M8.322,14.919,5.5,12.093l-1,.953,3.822,3.814L16.5,8.688l-1-.953Z" transform="translate(1223.5 365.203)" fill="#ed1c24" stroke="#ed1c26" stroke-width="0.2"/>
+      </g>
+      <g transform="translate(-1228 -292.938)">
+        <line id="Line_472-6" data-name="Line 472" x1="40" transform="translate(1249.5 377.5)" fill="none" stroke="#ed1c24" stroke-linecap="round" stroke-width="2"/>
+        <path id="Icon_ionic-md-checkmark-6" data-name="Icon ionic-md-checkmark" d="M8.322,14.919,5.5,12.093l-1,.953,3.822,3.814L16.5,8.688l-1-.953Z" transform="translate(1223.5 365.203)" fill="#ed1c24" stroke="#ed1c26" stroke-width="0.2"/>
+      </g>
+    </g>
+  </g>
+</svg>

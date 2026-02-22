@@ -1,0 +1,262 @@
+import { accountService } from "../service/accountService";
+import { getOS } from "@/utills/browserDetails";
+import { UserTypeEnum } from "@/shared/enum/ums-user-status.enum";
+import { safeParseJSON } from "@/utills";
+import { AccountDetailsModel } from "@/shared/models";
+import { ensureObject } from "@/utills/commonUtils";
+
+const BASE_URL = process.env.API_BASE_URL || "";
+const isProd = process.env.NEXT_PUBLIC_IS_PROD === "true";
+
+let userType = UserTypeEnum.SUPER_ADMIN;
+let parentDTO = { parentEmailId: "", parentMsisdn: "" };
+let accountNo: any;
+
+try {
+  const user = safeParseJSON(accountService.getUser()) as any;
+  if (user) {
+    userType = user.userType || UserTypeEnum.ADMIN;
+    parentDTO.parentEmailId = user.parent?.email || "";
+    parentDTO.parentMsisdn = user.parent?.msisdn || "";
+    accountNo = user.accountId;
+  }
+} catch (exp) {
+  console.warn("User parsing failed", exp);
+}
+
+export async function fetchClient(endpoint: string, options: RequestInit = {}) {
+  const url = `${BASE_URL}${endpoint}`;
+  const headers: any = {
+    "opco": process.env.NEXT_PUBLIC_OPCO || "",
+    "product": process.env.NEXT_PUBLIC_PRODUCT || "",
+    "x-api-key": isProd
+      ? process.env.NEXT_PUBLIC_BFE_PROD_BFE_A_K || ""
+      : process.env.NEXT_PUBLIC_BFE_UAT_BFE_A_K || "",
+    "x-service-id": isProd
+      ? process.env.NEXT_PUBLIC_BFE_PROD_SERVICE_ID || ""
+      : process.env.NEXT_PUBLIC_BFE_UAT_SERVICE_ID || "",
+    "x-app-version": isProd
+      ? process.env.NEXT_PUBLIC_BFE_PROD_X_APP_VERSION || ""
+      : process.env.NEXT_PUBLIC_BFE_UAT_X_APP_VERSION || "",
+    "x-client-id": isProd
+      ? process.env.NEXT_PUBLIC_BFE_PROD_X_CLIENT_ID || ""
+      : process.env.NEXT_PUBLIC_BFE_UAT_X_CLIENT_ID || "",
+    "x-group-code": isProd
+      ? process.env.NEXT_PUBLIC_BFE_PROD_X_GROUP_CODE || ""
+      : process.env.NEXT_PUBLIC_BFE_UAT_X_GROUP_CODE || "",
+    "x-channel-code": isProd
+      ? process.env.NEXT_PUBLIC_BFE_PROD_X_CHANNEL_CODE || ""
+      : process.env.NEXT_PUBLIC_BFE_UAT_X_CHANNEL_CODE || "",
+    "requestDate": Date.now().toString(),
+    "requestId": Math.random().toString(36).substring(2, 12),
+    "x-device-type": getOS() || "",
+    "Accept-Encoding": "identity",
+    ...(options.headers || {}),
+  };
+
+  if (typeof window !== "undefined") {
+    const token = accountService.getAccessToken();
+    if (token) {
+      headers["Authorization"] = `${token}`;
+    }
+  }
+
+  let body = options.body;
+  console.log(body);
+  
+  body = JSON.stringify(body);
+
+
+
+headers["Content-Type"] = "application/json";
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      body,
+    });
+
+
+
+    if (!response.ok) {
+      const statusCode = response.status;
+      const requestUrl = response.url.toLowerCase();
+
+      if ((statusCode === 401 || statusCode === 403) && !requestUrl.includes("reset-password")) {
+        if (typeof window !== "undefined") {
+          accountService.logOut();
+        }
+      } else if (statusCode === 503) {
+        console.warn("Service Unavailable");
+      } else if (statusCode === 500) {
+        console.error("Internal Server Error");
+      }
+
+      throw new Error(`HTTP error! Status: ${statusCode}`);
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    console.error("[Fetch Error]", error.message || error);
+    throw error;
+  }
+}
+
+
+
+import axios from "axios";
+import { errorNotifierInterceptor } from "./errorNotifierInterceptor";
+import { accountService } from "../service/accountService";
+import { getOS } from "@/utills/browserDetails";
+
+import http from 'http';
+import https from 'https';
+import { UserTypeEnum } from "@/shared/enum/ums-user-status.enum";
+import { safeParseJSON } from "@/utills";
+import { AccountDetailsModel } from "@/shared/models";
+
+const axiosClient = axios.create({
+  baseURL: process.env.API_BASE_URL || "",
+  timeout: 60000,
+  httpAgent: new http.Agent({ keepAlive: true }),
+  httpsAgent: new https.Agent({ keepAlive: true }),
+});
+const isProd = process.env.NEXT_PUBLIC_IS_PROD === "true";
+let userType = UserTypeEnum.SUPER_ADMIN;
+let parentDTO = {'parentEmailId' : '', 'parentMsisdn' : ''}
+let currentAccount: AccountDetailsModel;
+let accountNo: any;
+// Request interceptor: add global/dynamic headers
+
+try {
+  const user = safeParseJSON(accountService.getUser()) as any;
+  if (user) {
+    userType = user.userType || UserTypeEnum.ADMIN;
+    parentDTO.parentEmailId =  user.parent.email;
+    parentDTO.parentMsisdn = user.parent.msisdn;
+    // currentAccount = accountService.getCurrentAccountDetails();
+    accountNo = user.accountId
+  }
+} catch(exp) {
+
+}
+axiosClient.interceptors.request.use(
+  (config) => {
+    config.headers["opco"] = process.env.NEXT_PUBLIC_OPCO;
+    config.headers["product"] = process.env.NEXT_PUBLIC_PRODUCT;
+    config.headers["requestDate"] = Date.now().toString();
+    config.headers["requestId"] = Math.random().toString(36).substring(2, 12);
+    config.headers["x-device-type"] = getOS() || ""
+
+    if (config.headers?.isBusinessPayment) {
+      config.headers["x-service-id"] = process.env.NEXT_PUBLIC_BFE_CI_PROD_SERVICE_ID;
+      config.headers["x-app-version"] = process.env.NEXT_PUBLIC_BFE_CI_PROD_X_APP_VERSION;
+    } else {
+      config.headers["x-api-key"] = isProd
+        ? process.env.NEXT_PUBLIC_BFE_PROD_BFE_A_K
+        : process.env.NEXT_PUBLIC_BFE_UAT_BFE_A_K;
+      config.headers["x-service-id"] = isProd
+        ? process.env.NEXT_PUBLIC_BFE_PROD_SERVICE_ID
+        : process.env.NEXT_PUBLIC_BFE_UAT_SERVICE_ID;
+      config.headers["x-app-version"] = isProd
+        ? process.env.NEXT_PUBLIC_BFE_PROD_X_APP_VERSION
+        : process.env.NEXT_PUBLIC_BFE_UAT_X_APP_VERSION;
+      config.headers["x-client-id"] = isProd
+        ? process.env.NEXT_PUBLIC_BFE_PROD_X_CLIENT_ID
+        : process.env.NEXT_PUBLIC_BFE_UAT_X_CLIENT_ID;
+      config.headers["x-group-code"] = isProd
+        ? process.env.NEXT_PUBLIC_BFE_PROD_X_GROUP_CODE
+        : process.env.NEXT_PUBLIC_BFE_UAT_X_GROUP_CODE;
+      config.headers["x-channel-code"] = isProd
+        ? process.env.NEXT_PUBLIC_BFE_PROD_X_CHANNEL_CODE
+        : process.env.NEXT_PUBLIC_BFE_UAT_X_CHANNEL_CODE;
+    }
+    
+    // Add Authorization token from localStorage on client only
+    if (typeof window !== "undefined") {
+      const token = accountService.getAccessToken();
+      if (token) {
+        config.headers["Authorization"] = `${token}`;
+      }
+    }
+
+    if (config?.method?.toLowerCase() === 'post' && (userType == UserTypeEnum.VIEW_ADMIN || userType == UserTypeEnum.ADMIN))  {
+      
+      const originalData = typeof config.data === "string" ? safeParseJSON(config.data) : config.data;
+      config.data = safeParseJSON(JSON.stringify({
+        ...originalData,
+        parentDTO,
+        accountNo,
+      }));
+
+    }
+
+    // Log request info
+    // console.log(
+    //   `[Axios Request] ${config.method?.toUpperCase()} ${config.url}`
+    // );
+
+    return config;
+  },
+  (error) => {
+    console.log("[Axios Request Error]", error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor: log and handle errors
+axiosClient.interceptors.response.use(
+  (response) => {
+    // console.log(`[Axios Response] ${response.status} ${response.config.url}`);
+    return response;
+  },
+  (error) => {
+    const statusCode = error?.response?.status;
+    const requestUrl = error?.response?.config?.url?.toLowerCase();
+    if (statusCode === 401 || statusCode === 403) {
+      if (!requestUrl?.includes('reset-password') && typeof window !== 'undefined') {
+        accountService.logOut();
+      }
+    } else if (statusCode === 503) {
+      console.warn('Service Unavailable');
+    } else if (statusCode === 500) {
+      console.log('Internal Server Error');
+    } else if (error.request) {
+      console.log('[Axios No Response]', error.request);
+    } else {
+      console.log('[Axios Setup Error]', error.message);
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
+export default axiosClient;
+
+
+import type { AxiosError } from 'axios';
+import { accountService } from '../service/accountService';
+
+export const errorNotifierInterceptor = (error: AxiosError): Promise<never> => {
+  const statusCode = error?.response?.status;
+  const requestUrl = error?.response?.config?.url;
+
+  if (statusCode) {
+    console.log(`[Axios Response Error] ${statusCode} ${requestUrl}`, error.response?.data);
+
+    if (statusCode === 401 && typeof window !== 'undefined') {
+      console.warn('Unauthorized! Logging out user...');
+      accountService.logOut();
+    }
+
+    // You can add more status-specific handling here
+    // e.g., 403, 500, etc.
+  } else if (error.request) {
+    console.log('[Axios No Response]', error.request);
+  } else {
+    console.error('[Axios Error]', error.message);
+  }
+
+  return Promise.reject(error);
+};

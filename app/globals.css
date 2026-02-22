@@ -1,26 +1,311 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * GLOBAL STYLES - Mobile-First SaaS
+ * Mock-matching design tokens
+ */
+
+@theme {
+  /* Airtel primary - matches mock */
+  --color-primary: #E40000;
+  /* Dark blue/charcoal for login buttons (mock) */
+  --color-charcoal: #1e293b;
+  /* Login card - float shadow */
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
+
+:root {
+  --color-primary: #E40000;
+  --color-primary-dark: #B30000;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --color-charcoal: #1e293b;
+}
+
+@layer base {
+  html {
+    /* Prevent font scaling on orientation change */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    /* Prevents rubber-band scrolling on iOS */
+    position: fixed;
+    width: 100%;
+    min-height: 100dvh; /* Dynamic viewport - critical for mobile */
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Safe area padding for notch devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@layer utilities {
+  /* Mobile-first min height */
+  .min-h-screen-mobile {
+    min-height: 100dvh;
+  }
+}
+
+@import "tailwindcss";
+@tailwind utilities;
+
+:root {
+  --background: #FAFAFA;
+  --foreground: #fffbfbe6;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/lato-light-webfont.eot');
+  src: url('/fonts/lato-light-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/fonts/lato-light-webfont.woff2') format('woff2'),
+       url('/fonts/lato-light-webfont.woff') format('woff'),
+       url('/fonts/lato-light-webfont.svg#latolight') format('svg');
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+    font-family: 'Lato';
+    src: url('/fonts/Lato-Regular.eot');
+    src: url('/fonts/Lato-Regular.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/Lato-Regular.woff2') format('woff2'),
+         url('/fonts/Lato-Regular.woff') format('woff'),
+         url('/fonts/Lato-Regular.svg#Lato-Regular') format('svg');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/lato-medium-webfont.woff2') format('woff2'),
+       url('/fonts/lato-medium-webfont.woff') format('woff'),
+       url('/fonts/lato-medium-webfont.ttf') format('truetype'),
+       url('/fonts/lato-medium-webfont.svg#latomedium') format('svg');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/lato-semibold-webfont.woff2') format('woff2'),
+       url('/fonts/lato-semibold-webfont.woff') format('woff'),
+       url('/fonts/lato-semibold-webfont.ttf') format('truetype'),
+       url('/fonts/lato-semibold-webfont.svg#latosemibold') format('svg');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/lato-bold-webfont.woff2') format('woff2'),
+       url('/fonts/lato-bold-webfont.woff') format('woff'),
+       url('/fonts/lato-bold-webfont.ttf') format('truetype'),
+       url('/fonts/lato-bold-webfont.svg#latobold') format('svg');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/fonts/lato-heavy.woff2') format('woff2'),
+       url('/fonts/lato-heavy.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+ 
+}
+
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Lato', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #7e7c7cf8;
   }
 }
 
 body {
-  background: var(--background);
+  /* background: var(--background); */
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-family: 'Lato';
+  
 }
+
+
+.bg-custom-overlay {
+  background-color: #00000042;
+}
+
+.bg-custom-confirmPayment {
+  background-color:rgb(2 2 2 / 61%);
+}
+
+.bg-lightorange{
+  background: #f6f1f1;
+}
+
+.toast-msg {
+  width: 100%;
+  position: fixed;
+  height: 50px;
+  z-index: 100000;
+  color: white;
+  top: 0;
+  left: 0;
+  animation: move 2s both;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.toast-msg p {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  line-height: 50px;
+  margin: 0 auto;
+  max-width: 90%;
+  text-align: center;
+}
+.toast-msg p span {
+  font-weight: bold;
+  margin-right: 8px;
+}
+.toast-msg h4 {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  font-size: 20px;
+  color: #fff;
+  cursor: pointer;
+}
+.toast-success {
+  background-color: #0AAF69;
+}
+.toast-error {
+  background-color: #ED1C24;
+}
+.toast-warning {
+  background-color: orange;
+}
+@keyframes move {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.close {
+  position: absolute;
+  top: 7px;
+  right: 10px;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+.toast-heading {
+  margin-top: 10px;
+
+@layer utilities {
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #f87171; /* red-500 */
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+.react-datepicker-wrapper {
+  width: 100% !important;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.6s infinite linear;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.15) 0%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.15) 100%
+  );
+  background-size: 200% 100%;
+}
+
+
+@media (min-height: 700px) {
+  .vh700\:absolute { position: absolute; }
+  .vh700\:bottom-0 { bottom: 0; }
+  .vh700\:left-0 { left: 0; }
+  .vh700\:right-0 { right: 0; }
+}
+
+
+/* GLOBLE CLASSES  &&  TAILWIND UTILITY */
+
+@utility form-label { @apply block text-sm  text-black mb-[5px]}
+@utility form-control { 
+  @apply bg-white text-black block mb-0 w-full h-[40px] rounded-[3px] text-base border border-[#D6D6D6] px-3 py-2  focus:outline-none focus:ring-2 focus:ring-blue-500 
+}
+@utility button { @apply  bg-slate-900 text-white py-[10px] rounded-[3px] text-sm  hover:bg-red-700 min-h-[40px] }
+@utility button-outline { @apply  border border-red-600 text-red-600 rounded-[3px] text-base  hover:bg-red-700 hover:text-white  px-[20px] py-[8px]}
+@utility cancel-button { @apply  border border-[#777777] text-[#777777] rounded-[3px] text-base   px-[20px] py-[8px]}
+
+@utility button-disabled { @apply   opacity-50 cursor-not-allowed}
+@utility card { @apply bg-white rounded-[12px] shadow-[0_0px_14px_#0000001a] p-[15px]}
+@utility self-service-button {@apply flex items-center justify-center gap-2 w-[157px] h-[48px] px-[8px] py-[13px] rounded-[8px] border border-[#1F2436] bg-white }
+@utility font-color-text {@apply text-[#454F63]}
+@utility blk-color-text {@apply text-[#1F2436]}
+@utility background-color {@apply text-[#9B91C1]}
+@utility red-color {@apply text-[#ED1C26]}
+

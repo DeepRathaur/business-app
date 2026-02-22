@@ -1,0 +1,16 @@
+<svg width="88" height="99" viewBox="0 0 88 99" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M87.25 0.75H0.75V98.126H87.25V0.75Z" stroke="#ED1C24" stroke-width="1.5"/>
+<mask id="mask0_65_8337" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="7" y="14" width="67" height="74">
+<path d="M73.004 14.3994H7.91003V87.1144H73.004V14.3994Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_65_8337)">
+<path d="M69.41 18.9609H49.41" stroke="#ED1C24" stroke-width="2" stroke-linecap="round"/>
+<path d="M22.732 21.5834L19.91 18.7574L18.91 19.7104L22.732 23.5244L30.91 15.3524L29.91 14.3994L22.732 21.5834Z" fill="#ED1C24" stroke="#ED1C26" stroke-width="0.2"/>
+<path d="M69.41 38.9609H49.41" stroke="#ED1C24" stroke-width="2" stroke-linecap="round"/>
+<path d="M22.732 41.5834L19.91 38.7574L18.91 39.7104L22.732 43.5244L30.91 35.3524L29.91 34.3994L22.732 41.5834Z" fill="#ED1C24" stroke="#ED1C26" stroke-width="0.2"/>
+<path d="M69.41 58.9609H49.41" stroke="#ED1C24" stroke-width="2" stroke-linecap="round"/>
+<path d="M22.732 61.5834L19.91 58.7574L18.91 59.7104L22.732 63.5244L30.91 55.3524L29.91 54.3994L22.732 61.5834Z" fill="#ED1C24" stroke="#ED1C26" stroke-width="0.2"/>
+<path d="M69.41 78.9609H49.41" stroke="#ED1C24" stroke-width="2" stroke-linecap="round"/>
+<path d="M22.732 81.5834L19.91 78.7574L18.91 79.7104L22.732 83.5244L30.91 75.3524L29.91 74.3994L22.732 81.5834Z" fill="#ED1C24" stroke="#ED1C26" stroke-width="0.2"/>
+</g>
+</svg>

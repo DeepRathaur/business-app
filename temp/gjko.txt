@@ -1,0 +1,1047 @@
+NEXT_PUBLIC_PRODUCTION_URL=https://www.airtel.com.ng/business/care/
+NEXT_PUBLIC_PRODUCTION_URL_ABC=https://airtel.com.ng/
+NEXT_PUBLIC_PRODUCTION_URL_ABC_LITE=https://abcliteuat.airtel.com.ng/
+NEXT_PUBLIC_PRODUCTION=false
+NEXT_PUBLIC_OPCO=NG
+NEXT_PUBLIC_PRODUCT=ENTERPRISE_PORTAL
+NEXT_PUBLIC_LOCALE_KEY=frontend_locale_labels_test
+NEXT_PUBLIC_PROJECT_PREFIX=
+NEXT_PUBLIC_IS_PROD=false
+NEXT_PUBLIC_ENCRYPTION=true
+
+# BFE PROD
+NEXT_PUBLIC_BFE_PROD_BFE_A_K=3fa8849d-411c-4629-9f15-b744fb6d009b
+NEXT_PUBLIC_BFE_PROD_SERVICE_ID=csteam_enterprise_portal_backend_webctx
+NEXT_PUBLIC_BFE_PROD_X_APP_VERSION=1.0.0
+NEXT_PUBLIC_BFE_PROD_X_CLIENT_ID=5
+NEXT_PUBLIC_BFE_PROD_X_GROUP_CODE=ENT_ABC
+NEXT_PUBLIC_BFE_PROD_X_CHANNEL_CODE=ENT_ABC_WEB
+
+# BFE UAT
+NEXT_PUBLIC_BFE_UAT_BFE_A_K=95faaa52-f85f-455f-9678-72c6f1221031
+NEXT_PUBLIC_BFE_UAT_SERVICE_ID=csteam_enterprise_portal_backend_webctx
+NEXT_PUBLIC_BFE_UAT_X_APP_VERSION=1.0.0
+NEXT_PUBLIC_BFE_UAT_X_CLIENT_ID=5
+NEXT_PUBLIC_BFE_UAT_X_GROUP_CODE=ENT_ABC
+NEXT_PUBLIC_BFE_UAT_X_CHANNEL_CODE=ENT_ABC_WEB
+
+# Google Analytics
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=G-DW35DCMNWL
+
+# OPCO Config
+NEXT_PUBLIC_OPCO_CONFIG_MINLENGTH=10
+NEXT_PUBLIC_OPCO_CONFIG_MAXLENGTH=10
+NEXT_PUBLIC_OPCO_CONFIG_ENABLE_DUAL_CURRENCY=false
+
+# BFE CI PROD
+NEXT_PUBLIC_BFE_CI_PROD_SERVICE_ID=enterprise_business_payment_service_webctx
+NEXT_PUBLIC_BFE_CI_PROD_X_APP_VERSION=1.0.0
+
+# BFE CI UAT
+NEXT_PUBLIC_BFE_CI_UAT_SERVICE_ID=enterprise_business_payment_service_webctx
+NEXT_PUBLIC_BFE_CI_UAT_X_APP_VERSION=1.0.0
+
+# .env.local or .env.production
+SENTRY_DSN=https://7f2fca00dc19c2b07a75591487241c4a@sentinel.airtel.africa/152
+SENTRY_ENVIRONMENT=development
+SENTRY_RELEASE=your-app-name@1.0.0
+
+
+
+
+import axiosClient from "@/core/api/axiosClient";
+import { APPLICATION_URL, Configuration_URL, CSURl, FEATURE_URL, InvoicesURl, MasterDataURl, OpportunityURl, PaymentHistoryURl, PaymentUrl, PaymentUrlBps, PaymentUrlCpass, RENDER_URL, User_URL } from "@/core/constant/url";
+import { SendOtpModel } from "@/core/enum/send-otp.model";
+import { LoginModel } from "@/core/model/login.model";
+import { SendotpResponseModel } from "@/core/model/response-model/send-otp-response.model";
+import { accountService } from "@/core/service/accountService";
+import { PaymentFlowEnum } from "@/shared/enum";
+import {
+  AccountDetailsResponseModel,
+  AccountStatementModel,
+  AccountStatementResponseModel,
+  BannerModel,
+  BannerResponseModel,
+  BasePlanResponse,
+  BillSummaryResponseModel,
+  BuyAirtimeModel,
+  ChildUserModel,
+  ChildUserResponseModel,
+  CreateInteractionIssueModel,
+  FetchOpportunitiesResponseModel,
+  FetchSingleOpportunitiesResponseModel,
+  FetchUserResponseModel,
+  GetAccountStatementModel,
+  GetBillSummaryModel,
+  GetLineCountModel,
+  GetLineDetailsModel,
+  GetPaymentHistoryModel,
+  GetPaymentInitiateModel,
+  GetPaymentOptionModel,
+  GetSelfServiceHistoryModel,
+  InteractionIssueResponseModel,
+  InvoicesListResponseModel,
+  LineCountResponseModel,
+  LineDetailsResponseModel,
+  LineDetailsSnapshotsResponseModel,
+  LineSearchByMsisdnAccountModel,
+  OpportunityRequestModel,
+  PaymentHistoryListResponseModel,
+  PaymentInitiateResponseModel,
+  PaymentOptionResponseModel,
+  requestChildUserModel,
+  SelfServiceHistoryResponseModel,
+  UMSDetailsResponseModel,
+} from "@/shared/models";
+import {
+  DownloadInvoceResponseModel,
+  DownloadInvoicePdfModel,
+  DownloadPaymentHistoryModel,
+  DownloadPdfModel,
+} from "@/shared/models/download-pdf.model";
+import {
+  FetchProductDetailsModel,
+  FetchProductDetailsResponseModel,
+} from "@/shared/models/fetch-product-details.model";
+import {
+  GetPaymentProcessModel,
+  PaymentProcessResponseModel,
+} from "@/shared/models/payment-process.model";
+import {
+  GetTicketHistoryModel,
+  IssueHistoryModel,
+  IssueHistoryResponseModel,
+  TicketHistoryResponseModel,
+} from "@/shared/models/ticket-history.model";
+import {
+  TourOptionModel,
+  TourOptionResponseModel,
+} from "@/shared/models/tour-option.model";
+import { UrlBuilder } from "@/utills/urlBuilder";
+
+export const getFeatureLayout = async () => {
+  const input = { product: "BETA_DASHBOARD_ABC" };
+  const url = UrlBuilder.createUrl(FEATURE_URL.FETCH_CONFIG);
+  const response = await axiosClient.post(url, input);
+  return response.data;
+};
+
+export const submitConfig = async (input: any) => {
+  const request = { ...input, product: "BETA_DASHBOARD_ABC" };
+  const response = await axiosClient.post(
+    `${FEATURE_URL.SAVE_CONFIG}`,
+    request
+  );
+  return response.data;
+};
+
+export const getTouroptions = async (
+  input: TourOptionModel
+): Promise<TourOptionResponseModel> => {
+  try {
+    const url = UrlBuilder.createUrl(Configuration_URL.URL);
+    const response = await axiosClient.post<TourOptionResponseModel>(
+      url,
+      input
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching tour options:", error);
+    throw error;
+  }
+};
+
+export const getUserDetails = async (
+  IS_UMS2_ENABLE: boolean
+): Promise<FetchUserResponseModel> => {
+  try {
+    console.log("ums 2 enable", IS_UMS2_ENABLE);
+    const fetchUserUri = IS_UMS2_ENABLE
+      ? User_URL.FETCH_USER_DETAILS_V2
+      : User_URL.FETCH_USER_DETAILS;
+    const url = UrlBuilder.createUrl(fetchUserUri);
+    const response = await axiosClient.post(url, {});
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching tour options:", error);
+    throw error;
+  }
+};
+
+export const getUMSPermission = async (
+  IS_UMS2_ENABLE: boolean
+): Promise<UMSDetailsResponseModel> => {
+  try {
+    const fetchUserUri = IS_UMS2_ENABLE
+      ? User_URL.UMS2_FETCH_UMS_DETAILS
+      : User_URL.FETCH_UMS_DETAILS;
+    const url = UrlBuilder.createUrl(fetchUserUri);
+    const response = await axiosClient.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching tour options:", error);
+    throw error;
+  }
+};
+
+export const loadAccountDetails = async (
+  input: any
+): Promise<AccountDetailsResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.GET_ACCOUNT_DETAILS);
+  const response = await axiosClient.post(url, input);
+  return response.data;
+};
+
+export const loadInvoiceDetails = async (
+  input: any
+): Promise<InvoicesListResponseModel> => {
+  const url = UrlBuilder.createUrl(InvoicesURl.GET_INVOICES);
+  return handleRequest("post", url, input);
+};
+
+export const loadPaymentHistoryDetails = async (
+  input: GetPaymentHistoryModel
+): Promise<PaymentHistoryListResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentHistoryURl.GET_PAYMENT_HISTORY);
+  return handleRequest("post", url, input);
+};
+
+export const loadBillSummary = async (
+  input: GetBillSummaryModel
+): Promise<BillSummaryResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.GET_BILL_SUMMARY);
+  return handleRequest("post", url, input);
+};
+
+const handleRequest = async <T>(
+  method: "get" | "post",
+  url: string,
+  data?: any,
+  isFile: boolean = false,
+  isBusinessPayment: boolean = false
+): Promise<T> => {
+  try {
+    const config = isFile ? { responseType: "blob" as const } : {};
+    const configServiceId = isBusinessPayment
+      ? {
+          "x-service-id":
+            process.env.NEXT_PUBLIC_BUSINESS_PAYMENT_BFE_SERVICE_ID,
+        }
+      : {};
+
+    // const headerConfig = (isBusinessPayment)?configServiceId:config;
+    const response =
+      method === "post"
+        ? await axiosClient.post<T>(url, data, config)
+        : await axiosClient.get<T>(url + data);
+    return response.data;
+  } catch (error) {
+    console.error(`API Error [${method.toUpperCase()} ${url}]:`, error);
+
+    
+    throw error;
+  }
+};
+
+export const loginUser = async (
+  input: LoginModel | string,
+  isEncrypted: boolean,
+  IS_UMS2_ENABLE: boolean | false
+): Promise<any> => {
+  try {
+    const loginUrl = isEncrypted
+      ? User_URL.ENTERPRISE_BACKEND_LOGIN
+      : IS_UMS2_ENABLE
+      ? User_URL.UMS2_LOGIN
+      : User_URL.LOGIN;
+    const url = UrlBuilder.createUrl(loginUrl);
+    const response = await axiosClient.post(
+      url,
+      isEncrypted ? { record: input } : input
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching tour options:", error);
+    throw error;
+  }
+};
+
+export const loadLayoutByCategoryName = async (input: any): Promise<any> => {
+  try {
+    const url = UrlBuilder.createUrl(
+      MasterDataURl.GET_SR_LAYOUT_BY_CATEGORY_NAME
+    );
+    const response = await axiosClient.post(url, input);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching tour options:", error);
+    throw error;
+  }
+};
+
+export const getAllOpportunityOrders = async (
+  input: OpportunityRequestModel
+): Promise<FetchOpportunitiesResponseModel> => {
+  const url = UrlBuilder.createUrl(OpportunityURl.GET_OPPORTUNITIES);
+  return handleRequest("post", url, input);
+};
+
+export const getAllTickets = async (
+  input: GetTicketHistoryModel
+): Promise<TicketHistoryResponseModel> => {
+  const url = UrlBuilder.createUrl(CSURl.GET_TICKET_HISTORY);
+  return handleRequest("post", url, input);
+};
+
+export const getOpportunityByOrderNo = async (
+  input: string
+): Promise<FetchSingleOpportunitiesResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.GET_OPPORTUNITY_BY_ORDER);
+  return handleRequest("post", url, input);
+};
+
+export const loadAccountStatementData = async (
+  input: GetAccountStatementModel
+): Promise<AccountStatementResponseModel> => {
+  const url = UrlBuilder.createUrl(APPLICATION_URL.GET_ACCOUNT_STATEMENT);
+  return handleRequest("post", url, input);
+};
+
+export const loadAllChildUsers = async (
+  input: requestChildUserModel,
+  IS_UMS2_ENABLE: boolean
+): Promise<ChildUserResponseModel> => {
+  const fetchUserUri = IS_UMS2_ENABLE
+    ? APPLICATION_URL.FETCH_CHILD_USER_V2
+    : APPLICATION_URL.FETCH_CHILD_USER;
+  const url = UrlBuilder.createUrl(fetchUserUri);
+  return handleRequest("post", url, input);
+};
+
+export const createServiceRequest = async (
+  input: CreateInteractionIssueModel,
+  uniqueCode: string = ""
+): Promise<InteractionIssueResponseModel> => {
+  const url = UrlBuilder.createUrl(
+    uniqueCode ? User_URL.OPEN_API_CREATE_SR : APPLICATION_URL.CREATE_SR
+  );
+  if (uniqueCode) {
+    const headers = {
+      UniqueCode: uniqueCode,
+    };
+    const response = await axiosClient.post(url, input, { headers });
+    return response.data;
+  } else {
+    return handleRequest("post", url, input);
+  }
+};
+
+export const uploadFile = async (
+  form: FormData,
+  onProgress?: (percent: number) => void
+): Promise<any> => {
+  const url = UrlBuilder.createUrl(RENDER_URL.UPLOAD_FILE);
+  try {
+    const response = await axiosClient.post(url, form, {
+      headers: {
+        //"Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          if (onProgress) onProgress(percent);
+        } else {
+          if (onProgress) onProgress(0); // fallback or skip
+        }
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error("[File Upload Error]", error);
+    throw error;
+  }
+};
+
+export const getTicketById = async (
+  input: IssueHistoryModel
+): Promise<IssueHistoryResponseModel> => {
+  const url = UrlBuilder.createUrl(APPLICATION_URL.GET_ISSUE_DETAILS);
+  return handleRequest("post", url, input);
+};
+
+export const getLineDetailsSnapshot = async (
+  input: GetLineDetailsModel
+): Promise<LineDetailsSnapshotsResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.GET_LINE_DETAILS_SNAPSHOT);
+  return handleRequest("post", url, input);
+};
+
+export const fetchProductUsageDetails = async (
+  input: FetchProductDetailsModel
+): Promise<FetchProductDetailsResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.PRODUCT_USAGE_DETAILS);
+  return handleRequest("post", url, input);
+};
+
+export const getSelfServiceHistory = async (
+  input: GetSelfServiceHistoryModel
+): Promise<SelfServiceHistoryResponseModel> => {
+  const url = UrlBuilder.createUrl(APPLICATION_URL.GET_SELF_SERVICE_HISTORY);
+  return handleRequest("post", url, input);
+};
+
+export const bannerSaveData = async (
+  input: BannerModel
+): Promise<BannerResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.SAVE_BANNER_CONFIGURATION);
+  return handleRequest("post", url, input);
+};
+
+export const getPaymentOption = async (
+  input: GetPaymentOptionModel,
+  IS_V3PO_ENABLE: boolean
+): Promise<PaymentOptionResponseModel> => {
+  const paymentUri = IS_V3PO_ENABLE
+    ? PaymentUrl.FETCH_PAYMENT_OPTION
+    : PaymentUrl.FETCH_PAYMENT_OPTION_OLD;
+  const url = UrlBuilder.createUrl(paymentUri);
+  return handleRequest("post", url, input);
+};
+
+export const initiatePaymentRequest = async (
+  input: BuyAirtimeModel
+): Promise<PaymentProcessResponseModel> => {
+  const path =
+    input &&
+    input.paymentFlow &&
+    input.paymentFlow === PaymentFlowEnum.UNAUTHENTICATED
+      ? PaymentUrl.PAYMENT_INITIATE
+      : PaymentUrl.INITIATE_BUY_AIRTIME;
+  const url = UrlBuilder.createUrl(path);
+  return handleRequest("post", url, input);
+};
+
+export const processPaymentRequest = async (
+  input: GetPaymentProcessModel
+): Promise<PaymentProcessResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrl.PROCESS_PAYMENTS);
+  return handleRequest("post", url, input);
+};
+
+export const getLineByMsisdnAccount = async (
+  input: LineSearchByMsisdnAccountModel
+): Promise<LineDetailsResponseModel> => {
+  const url = UrlBuilder.createUrl(
+    MasterDataURl.GET_LINE_DETAILS_MSISDNACCOUNT
+  );
+  return handleRequest("post", url, input);
+};
+
+export const getAllPlanDetailsByMsisdn = async (
+  input: FetchProductDetailsModel
+): Promise<BasePlanResponse> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.FETCH_BASE_PLAN);
+  return handleRequest("post", url, input);
+};
+
+export const getProductUsageByMsisdn = async (
+  input: FetchProductDetailsModel
+): Promise<FetchProductDetailsResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.PRODUCT_USAGE_DETAILS);
+  return handleRequest("post", url, input);
+};
+
+export const downloadAllInvoices = async (
+  input: DownloadInvoicePdfModel
+): Promise<Blob> => {
+  const url = UrlBuilder.createUrl(InvoicesURl.DOWNLOAD_ALL_INVOICES);
+  return handleRequest("post", url, input, true);
+};
+
+export const downloadSingleInvoices = async (
+  input: DownloadInvoicePdfModel,
+  isLargeInvoiceDisable: boolean
+): Promise<any> => {
+  const invoiceUrl = isLargeInvoiceDisable
+    ? InvoicesURl.DOWNLOAD_INVOICES_V1
+    : InvoicesURl.DOWNLOAD_INVOICES_V2;
+  const url = UrlBuilder.createUrl(invoiceUrl);
+  return handleRequest("post", url, input, isLargeInvoiceDisable);
+};
+
+export const downloadAllPaymentHistory = async (
+  input: DownloadPaymentHistoryModel
+): Promise<Blob> => {
+  const url = UrlBuilder.createUrl(PaymentHistoryURl.DOWNLOAD_PAYMENT_HISTORY);
+  return handleRequest("post", url, input, true);
+};
+
+export const downloadAccountStatement = async (
+  input: AccountStatementModel
+): Promise<Blob> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.DOWNLAOD_ACCOUNT_STATEMENT);
+  return handleRequest("post", url, input, true);
+};
+
+export const getAllLines = async (
+  input: GetLineDetailsModel
+): Promise<LineDetailsResponseModel> => {
+  const url = UrlBuilder.createUrl(MasterDataURl.GET_LINE_DETAILS);
+  return handleRequest("post", url, input);
+};
+
+export const getLineTypeCount = async (
+  input: GetLineCountModel
+): Promise<LineCountResponseModel> => {
+  const url = UrlBuilder.createUrl(APPLICATION_URL.GET_LINE_COUNT);
+  return handleRequest("post", url, input);
+};
+
+export const checkAMStatus = async (input: string): Promise<any> => {
+  const url = UrlBuilder.createUrl(PaymentUrl.CHECK_AM_STATUS);
+  return handleRequest("get", url, input);
+};
+
+export const checkPaymentStatus = async (input: string): Promise<any> => {
+  const url = UrlBuilder.createUrl(PaymentUrl.FETCH_PAYMENT_STATUS);
+  return handleRequest("get", url, input);
+};
+
+export const downloadPaymentHistorySingle = async (
+  input: DownloadPdfModel
+): Promise<Blob> => {
+  const url = UrlBuilder.createUrl(
+    PaymentHistoryURl.DOWNLOAD_TRANSACTION_INVOICE
+  );
+  return handleRequest("post", url, input, true);
+};
+
+export const getPaymentInitiateRequest = async (
+  input: GetPaymentInitiateModel
+): Promise<PaymentInitiateResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlBps.FETCH_INITIATE_TRANSACTION);
+  const headers = {
+    isBusinessPayment: true,
+  };
+  const response = await axiosClient.post(url, input, { headers });
+  return response.data;
+};
+
+
+export const getPaymentOptionsFromBusinessService = async (
+  input: GetPaymentOptionModel): Promise<PaymentOptionResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlBps.FETCH_PAYMENT_OPTION);
+  const headers = {
+    isBusinessPayment: true,
+  };
+  const response = await axiosClient.post(url, input, { headers });
+  return response.data;
+};
+
+export const processPaymentRequestFromBusinessService = async (
+  input: GetPaymentProcessModel
+): Promise<PaymentProcessResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlBps.PROCESS_PAYMENTS);
+  return handleRequest("post", url, input);
+};
+
+export const getPaymentInitiateRequestForCpass = async (
+  input: GetPaymentInitiateModel
+): Promise<PaymentInitiateResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlCpass.FETCH_INITIATE_TRANSACTION);
+  const response = await axiosClient.post(url, input);
+  return response.data;
+};
+
+export const getPaymentOptionsFromCpaas = async (
+  input: GetPaymentOptionModel): Promise<PaymentOptionResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlCpass.FETCH_PAYMENT_OPTION);
+  const response = await axiosClient.post(url, input);
+  return response.data;
+};
+
+export const processPaymentRequestForCpaSS = async (
+  input: GetPaymentProcessModel
+): Promise<PaymentProcessResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlCpass.PROCESS_PAYMENTS);
+  return handleRequest("post", url, input);
+};
+
+export const checkAMStatusForCPaSS = async (input: string): Promise<PaymentInitiateResponseModel> => {
+  const url = UrlBuilder.createUrl(PaymentUrlCpass.FETCH_INITIATE_TRANSACTION);
+  return handleRequest("get", url, input);
+}
+
+export const sendOtpLogin = async (input:SendOtpModel,IS_UMS2_ENABLE:boolean|false): Promise<SendotpResponseModel> => {
+    const sendOtpurl = (IS_UMS2_ENABLE) ? User_URL.UMS2_SEND_OTP : User_URL.SEND_OTP;
+    const url = UrlBuilder.createUrl(sendOtpurl);
+    return handleRequest('post', url, input);
+};
+
+export const getBannerConfiguration = async (): Promise<BannerResponseModel> => {
+    const url = UrlBuilder.createUrl(MasterDataURl.GET_BANNER_CONFIGURATION);
+    return handleRequest('post', url, {});
+};
+
+
+import { URL } from "@/core/constant/url";
+
+export class UrlBuilder {
+    private static readonly _baseUrl: string = URL.BASE_URL;
+
+    public static createUrl(path: string, queryParams?: Record<string, string>): string {
+        let fullUrl = `${this._baseUrl}${path}`;
+        if (queryParams) {
+            const queryString = new URLSearchParams(queryParams).toString();
+            fullUrl += `?${queryString}`;
+        }
+        return fullUrl;
+    }
+}
+
+
+
+// import { environment } from "src/environments/environment";
+
+export const URL = {
+    BASE_URL: `${process.env.NEXT_PUBLIC_PROJECT_PREFIX}/bfe/web/`
+};
+
+export const Configuration_URL = {
+    URL: 'epb/api/enterprise-portal-backend/resource/v1/configuration',
+    LOCALE_URL: 'epb/api/enterprise-portal-backend/resource/v1/fetch-locale-labels',
+    SEND_OTP: 'userm/api/user-mngmnt/v3/send-otp'
+}
+
+export const User_URL = {
+    SEND_OTP:  'epb/api/enterprise-portal-backend/user/v3/send-otp', //'epb/api/enterprise-portal-backend/user/v3/send-otp', //'userm/api/user-mngmnt/v3/send-otp',
+    SEND_OTP_REGISTRATION: 'userm/api/user-mngmnt/v2/send-otp',
+    RE_SEND_OTP: 'userm/api/user-mngmnt/v2/resend-otp',
+    VERIFY_LOGIN_OTP: 'auth/api/user-mngmnt/v3/verify-login-otp',
+    VERIFY_REGISTRATION_OTP: 'auth/api/user-mngmnt/v1/verify-registration-otp',
+    REGISTER_USER: 'epb/api/enterprise-portal-backend/user/v1/register-user',
+    FORGOT_PASSWORD: 'userm/api/user-mngmnt/v1/forgot-password',
+    RESET_PASSWORD: 'userm/api/user-mngmnt/v1/reset-password',
+    LOGIN: 'auth/api/user-mngmnt/v2/login',
+    ENTERPRISE_BACKEND_LOGIN: 'epb/api/enterprise-portal-backend/user/v2/login',
+    VERIFY_USER: 'epb/api/enterprise-portal-backend/user/v1/verify-user',
+    REGISTER_USER_PB: 'epb/api/enterprise-portal-backend/user/v1/create-update-user',
+    GET_ACCOUNT_SUMMARY:'line-details model to be use???',
+    OPEN_API_FETCH_CATEGORY_ID: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/parent/categories?id=',
+    OPEN_API_FETCH_CATEGORIES: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/firstlast/categories',
+    OPEN_API_FETCH_LAYOUT: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/layout',
+    OPEN_API_CREATE_SR: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/interactions/issue',
+    GET_INVOICE_DETAILS: 'epb/api/enterprise-portal-backend/account/v1/paybill/invoice/search',
+    UMS2_SEND_OTP: 'uma/api/uma/send-login-otp',
+    UMS2_SEND_OTP_REGISTRATION: 'uma/api/uma/send-otp',
+    UMS2_VERIFY_LOGIN_OTP: 'uauth/api/uma/verify-login-otp',
+    UMS2_VERIFY_REGISTRATION_OTP: 'uauth/api/uma/verify-registration-otp',
+    UMS2_LOGIN: 'uauth/api/uma/login',
+    UMS2_REGISTER_USER: 'epb/api/enterprise-portal-backend/user/v2/register-user',
+    UMS2_FORGOT_PASSWORD: 'uma/api/uma/user/forgot-password',
+    UMS2_RESET_PASSWORD: 'uma/api/uma/user/reset-password',
+    UMS2_RE_SEND_OTP: 'uma/api/uma/send-otp',
+    FETCH_USER_DETAILS: 'epb/api/enterprise-portal-backend/user/v1/fetch-user',
+    FETCH_USER_DETAILS_V2: 'epb/api/enterprise-portal-backend/user/v2/fetch-user',
+    FETCH_UMS_DETAILS: 'userm/api/user-mngmnt/users',
+    UMS2_FETCH_UMS_DETAILS: 'uma/api/uma/user',
+}
+
+export const FEATURE_URL = {
+    FETCH_CONFIG : 'epb/api/enterprise-portal-backend/resource/v1/configuration',
+    SAVE_CONFIG : 'epb/api/enterprise-portal-backend/resource/v1/configuration/save',
+    GET_SR_LAYOUT: '/api/enterprise-portal-backend/resource/v1/getSrLayout'
+}
+
+export const MasterDataURl = {
+    GET_ACCOUNT_DETAILS: 'epb/api/enterprise-portal-backend/account/v1/load',
+    GET_LINE_DETAILS: 'epb/api/enterprise-portal-backend/line/v1/search',
+    GET_BILL_SUMMARY: 'epb/api/enterprise-portal-backend/account/v1/bill-summary',
+    GET_LINE_DETAILS_SNAPSHOT: 'epb/api/enterprise-portal-backend/line/v1/snapshot',
+    DOWNLOAD_PAYMENT_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/payment-download',
+    DOWNLOAD_INVOICE: 'epb/api/enterprise-portal-backend/line/v1/snapshot',
+    FETCH_AIRTEL_MONEY_BALANCE: 'epb/api/enterprise-portal-backend/line/v1/airtel-money-balance',
+    FETCH_SUSPENDID_MSISDN: 'epb/api/enterprise-portal-backend/line/v1/fetch-suspended',
+    DOWNLAOD_ACCOUNT_STATEMENT: 'epb/api/enterprise-portal-backend/account/v1/statement-download',
+    FORGOT_PASSWORD: 'userm/api/user-mngmnt/v1/forgot-password',
+    FETCH_BASE_PLAN: 'epb/api/enterprise-portal-backend/line/v1/fetch-plan-details',
+    ACCOUNT_CONTRACT_EXPIRY_DATE: 'epb/api/enterprise-portal-backend/document/v1/fetch-contract-expiry-date',
+    PAYMENT_WAIVER: 'epb/api/enterprise-portal-backend/transaction/v1/waiver/payment',
+    PRODUCT_USAGE_DETAILS: 'epb/api/enterprise-portal-backend/line/v1/fetch-product-usage-details',
+    GET_CATEGORIES: 'epb/api/enterprise-portal-backend/sr-service/v1/firstlast/categories',
+    GET_TOUR_INFO: 'epb/api/enterprise-portal-backend/tour/getTourInfo',
+    UPDATE_TOUR_INFO: 'epb/api/enterprise-portal-backend/tour/updateTourInfo',
+    GET_CONFIGURATION: 'epb/api/enterprise-portal-backend/resource/v2/configuration',
+    GET_BUNDLES:'epb/api/enterprise-portal-backend/product-catalog/v1/fetch-bundles',
+    GET_ALL_LINES:'epb/api/enterprise-portal-backend/line/v1/fatchPlan',
+    PERMANENT_DEACTIVATION: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/Process-file-and-job',
+    FETCH_FILE_DETAILS:'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/fetch-file-content',
+    CREATE_UPDATE_NICKNAME: 'epb/api/enterprise-portal-backend/line/v1/create-update-nickname',
+    BUY_BULK_AIRTIME_SAVEDATA: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/save-file',
+    BULK_UPLOAD_DOWNLOAD: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/download-file',
+    GET_ALL_PLANS: 'epb/api/enterprise-portal-backend/product-catalog/v1/fetch-plans',
+    GET_LINE_DETAILS_MSISDNACCOUNT: 'epb/api/enterprise-portal-backend/line/v1/search/msisdn-through-account',
+    GET_BANNER_CONFIGURATION:'epb/api/enterprise-portal-backend/banner/findAll',
+    SAVE_BANNER_CONFIGURATION: 'epb/api/enterprise-portal-backend/banner/log-activity',
+    LINE_DOWNLOAD:'epb/api/enterprise-portal-backend/line-download/v1/generateReport',
+    GET_OPPORTUNITY_BY_ORDER: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchById',
+    GET_MASTER_DATA: 'epb/api/enterprise-portal-backend/opportunity/v1/fetch/master-details',
+    RAISE_SIM_SWAP: 'epb/api/enterprise-portal-backend/line/v1/sim-swap',
+    GET_SR_LAYOUT_BY_CATEGORY_NAME:'epb/api/enterprise-portal-backend/resource/v1/getSrLayout'
+}
+
+export const InvoicesURl = {
+    GET_INVOICES: 'epb/api/enterprise-portal-backend/account/v1/invoice/search',
+    DOWNLOAD_INVOICES_V1: 'epb/api/enterprise-portal-backend/account/v1/download-bill',
+    DOWNLOAD_INVOICES_V2: 'epb/api/enterprise-portal-backend/account/v2/download-bill',
+    DOWNLOAD_ALL_INVOICES: 'epb/api/enterprise-portal-backend/account/v1/invoice/download'
+}
+
+export const PaymentHistoryURl = {
+    GET_PAYMENT_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/payment/search',
+    DOWNLOAD_PAYMENT_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/payment-download',
+    DOWNLOAD_TRANSACTION_INVOICE: 'epb/api/enterprise-portal-backend/account/v1/download-invoice'
+}
+
+export const OpportunityURl = {
+    GET_OPPORTUNITIES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchAll',
+    GET_SINGLE_OPPORTUNITIES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchById',
+    GET_SERVICE_CATALOG: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchProducts',
+    GET_SERVICES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchServices',
+    GET_CATALOG_BANDWIDTH: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchProducts',
+    GET_COMPANY: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchCompany',
+    UPLOAD_FILE: 'epb/api/enterprise-portal-backend/opportunity/v1/uploadFile',
+    CREATE_OPPORTUNITY: 'epb/api/enterprise-portal-backend/opportunity/v1/create',
+    DOWNLOAD_FILE : 'epb/api/enterprise-portal-backend/opportunity/v1/downloadFile',
+    GET_MASTER_SERVICES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetch/master-services'
+}
+
+
+export const CSURl = {
+    GET_TICKET_HISTORY: 'epb/api/enterprise-portal-backend/sr-service/v1/tickets',
+}
+
+export const APPLICATION_URL = {
+    
+    GET_CATEGORIES: 'epb/api/enterprise-portal-backend/sr-service/v1/firstlast/categories',
+    GET_LAYOUT: 'epb/api/enterprise-portal-backend/sr-service/v1/layout',
+    GET_TICKET_HISTORY: 'epb/api/enterprise-portal-backend/sr-service/v1/tickets',
+    CREATE_SR: 'epb/api/enterprise-portal-backend/sr-service/v1/interactions/issue',
+    //GET_CATEGORY_HEIRARCHY: 'epb/api/enterprise-portal-backend/sr-service/v1/parent/categories?id=',
+    GET_ISSUE_DETAILS: 'epb/api/enterprise-portal-backend/sr-service/v1/issue/history',
+    GET_ACCOUNT_DETAILS: 'epb/api/enterprise-portal-backend/account/v1/load',
+    GET_BILL_SUMMARY: 'epb/api/enterprise-portal-backend/account/v1/bill-summary',
+    GET_ACCOUNT_STATEMENT: 'epb/api/enterprise-portal-backend/account/v1/statement',
+    GET_SELF_SERVICE_HISTORY: 'epb/api/enterprise-portal-backend/self-service/v1/fetch-history',
+    GET_TRANSACTION_HISTORY: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/transaction-history',
+    GET_LINE_DETAILS: 'epb/api/enterprise-portal-backend/line/v1/search',
+    GET_LINE_COUNT: 'epb/api/enterprise-portal-backend/line/v1/line-count',
+    SAVE_DOCUMENT_INFO: 'epb/api/enterprise-portal-backend/document/v1/add',
+    GET_DOCUMENT_LIST: 'epb/api/enterprise-portal-backend/document/v1/fetch',
+    DISABLE_DOCUMENT: 'epb/api/enterprise-portal-backend/document/v1/disable',
+    GET_MANAGE_SERVICES: 'epb/api/enterprise-portal-backend/resource/v1/get-manage-services',
+    CREATE_CHILD_USER: 'userm/api/user-mngmnt/v2/user/create',
+    CREATE_UPDATE_CHILD_USER_PB: 'epb/api/enterprise-portal-backend/user/v1/create-update-child-user',
+    DISABLE_CHILD_USER_PB: 'epb/api/enterprise-portal-backend/user/v1/disable-enable-child-user',
+    FETCH_CHILD_USER: 'epb/api/enterprise-portal-backend/user/v1/fetch-all-child-users',
+    GET_ALL_NOTIFICATION: 'epb/api/enterprise-portal-backend/notification/v1/fetch-all-notifications',
+    GET_NOTIFICATION_STATUS: 'epb/api/enterprise-portal-backend/notification/v1/mark-notification',
+    PERMANENT_DEACTIVATION: 'epb/api/enterprise-portal-backend/line/v1/msisdn/deactivate',
+    TEMPORARY_SUSPENSION: 'epb/api/enterprise-portal-backend/line/v1/suspend-msisdn',
+    FETCH_SUSPENDID_MSISDN: 'epb/api/enterprise-portal-backend/line/v1/fetch-suspended',
+    CANCEL_TEMPORARY_SUSPENSION: 'epb/api/enterprise-portal-backend/line/v1/cancel-suspension',
+    GET_ACCOUNT_TRX_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/statement/top-n-lines',
+    APPLY_DND: 'epb/api/enterprise-portal-backend/line/v1/get-dnd-status?msisdn=',
+    APPLY_DND_ACTIVATE: 'epb/api/enterprise-portal-backend/line/v1/activate-dnd',
+    LOGOUT_URL:'api/v1/user/logout',
+    DOWNLOAD_TRANSACTION: 'epb/api/enterprise-portal-backend/buy-bulk-product/v1/download-file',
+    DOWNLOAD_ALL_TRANSACTION: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/download-transaction',
+    FETCH_FILE_DETAILS:'epb/api/enterprise-portal-backend/buy-bulk-product/v1/fetch-file-content',
+    FETCH_SINGLE_FILE_DETAILS:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/record-status',
+    BULK_UPLOAD_DOWNLOAD: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/download-file',
+    LOAD_DOWNLOAD_REQUEST: 'epb/api/enterprise-portal-backend/line-download/v1/getAllReportStatus',
+    CREATE_UPDATE_CHILD_USER_PB_V2: 'epb/api/enterprise-portal-backend/user/v2/create-update-child-user',
+    DISABLE_CHILD_USER_PB_V2: 'epb/api/enterprise-portal-backend/user/v1/disable-enable-child-user',
+    FETCH_CHILD_USER_V2: 'epb/api/enterprise-portal-backend/user/v2/fetch-all-child-users',
+    DOWNLOAD_FILE:'epb/api/enterprise-portal-backend/line-download/v1/downloadReport'
+    }
+
+export const  RENDER_URL = {
+  UPLOAD_FILE : 'epb/api/enterprise-portal-backend/file/v2/upload-multiple-file',
+  DOWNLOAD_FILE : 'dss/v1/download',
+  DOWNLOAD_ALL : 'dss/rest/data/downloadAsZip',
+  USER_SEARCH: 'search/user/search/name',
+  USER_SEARCH_AUUID: 'search/user/search',
+  DELETE_FILE: 'dss/v1/hard-delete/resource_id',
+  UPLOAD_FILE_IN_PB: 'epb/api/enterprise-portal-backend/file/v1/upload-multiple-file',
+  UPLOAD_DEACTIVATION_FILE: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/upload-file'
+}
+
+export const PaymentUrl = {
+    FETCH_PAYMENT_OPTION: 'epb/api/enterprise-portal-backend/transaction/payment-options',
+    FETCH_PAYMENT_OPTION_OLD: 'epb/api/enterprise-portal-backend/transaction/v1/payment-options',
+    INITIATE_BUY_AIRTIME: 'epb/api/enterprise-portal-backend/transaction/v1/initiate',
+    PROCESS_PAYMENTS:'epb/api/enterprise-portal-backend/transaction/v1/process',
+    PROCESS_PAYMENTS_CG:'epb/api/enterprise-portal-backend/transaction/v1/process-cg',
+    FETCH_PAYMENT_STATUS :"epb/api/enterprise-portal-backend/transaction/fetch?txnId=",
+    CHECK_AM_STATUS: 'epb/api/enterprise-portal-backend/transaction/v1/status?tid=',
+    PAYMENT_INITIATE: 'epb/api/enterprise-portal-backend/openapi/transaction/v1/initiate',
+    GET_CARDS: 'epb/api/enterprise-portal-backend/transaction/v1/get-cards',
+    PAYSTACK :'/api/enterprise-portal-backend/transaction/v1/pg-callback/ENTERPRISE_PORTAL/paystack/status?txref=',
+    VERIFY_CARD: 'epb/api/enterprise-portal-backend/transaction/v1/verify-card-details',
+    SEND_OTP:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/process-payment',
+    RESEND_OTP:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/resend-otp',
+    PROCESS_OTP:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/process-otp',
+    CHECK_AIRTIME_BALANCE:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/query-balance?',
+    PROCESS_FILE: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/Process-file-and-job',
+    CURRENCY_CONVERSION: 'epb/api/enterprise-portal-backend/transaction/v1/currency-conversion'
+  }
+
+  export const PaymentUrlBps = {
+    FETCH_PAYMENT_OPTION: 'bps/api/business-payment/channel/transaction/payment-options',
+    PROCESS_PAYMENTS:'bps/api/business-payment/channel/transaction/v1/process',
+    FETCH_INITIATE_TRANSACTION :"bps/api/business-payment/channel/transaction/v1/fetch-payments",
+    FETCH_PAYMENT_STATUS :"bps/api/business-payment/channel/transaction/v1/fetch?txnId=",
+    CHECK_AM_STATUS: 'bps/api/business-payment/channel/transaction/v1/status?tid=',
+    PAYMENT_INITIATE: 'bps/api/business-payment/channel/transaction/v1/initiate',
+    TRANSACTION_ENQUIRY: 'bps/api/business-payment/channel/transaction/v1/enquiry',
+    SEND_OTP: 'bps/api/business-payment/channel/user/v1/send-otp',
+    VERIFY_OTP: 'bps/api/business-payment/channel/user/v1/verify-otp',
+    RESEND_OTP: 'bps/api/business-payment/channel/user/v1/resend-otp',
+    CHECK_AIRTIME_BALANCE: 'bps/api/business-payment/channel/transaction/v1/query-balance?',
+    PAYSTACK :'bps/api/business-payment/channel/transaction/v1/pg-callback/BUSINESS_PAY/PAYSTACK/status?txref='
+  }
+
+  export const PaymentUrlCpass = {
+    FETCH_PAYMENT_OPTION: 'epb/api/enterprise-portal-backend/CPaaS/transaction/payment-options',
+    PROCESS_PAYMENTS:'epb/api/enterprise-portal-backend/CPaaS/transaction/v1/process',
+    FETCH_INITIATE_TRANSACTION :"epb/api/enterprise-portal-backend/CPaaS/transaction/v1/fetch-payments",
+    FETCH_PAYMENT_STATUS :"epb/api/enterprise-portal-backend/CPaaS/transaction/v1/fetch?txnId=",
+    PAYMENT_INITIATE: 'epb/api/enterprise-portal-backend/CPaaS/transaction/v1/initiate',
+    TRANSACTION_ENQUIRY: 'epb/api/enterprise-portal-backend/CPaaS/transaction/v1/enquiry'
+  }
+
+
+
+  // import { environment } from "src/environments/environment";
+
+export const URL = {
+    BASE_URL: `${process.env.NEXT_PUBLIC_PROJECT_PREFIX}/bfe/web/`
+};
+
+export const Configuration_URL = {
+    URL: 'epb/api/enterprise-portal-backend/resource/v1/configuration',
+    LOCALE_URL: 'epb/api/enterprise-portal-backend/resource/v1/fetch-locale-labels',
+    SEND_OTP: 'userm/api/user-mngmnt/v3/send-otp'
+}
+
+export const User_URL = {
+    SEND_OTP:  'epb/api/enterprise-portal-backend/user/v3/send-otp', //'epb/api/enterprise-portal-backend/user/v3/send-otp', //'userm/api/user-mngmnt/v3/send-otp',
+    SEND_OTP_REGISTRATION: 'userm/api/user-mngmnt/v2/send-otp',
+    RE_SEND_OTP: 'userm/api/user-mngmnt/v2/resend-otp',
+    VERIFY_LOGIN_OTP: 'auth/api/user-mngmnt/v3/verify-login-otp',
+    VERIFY_REGISTRATION_OTP: 'auth/api/user-mngmnt/v1/verify-registration-otp',
+    REGISTER_USER: 'epb/api/enterprise-portal-backend/user/v1/register-user',
+    FORGOT_PASSWORD: 'userm/api/user-mngmnt/v1/forgot-password',
+    RESET_PASSWORD: 'userm/api/user-mngmnt/v1/reset-password',
+    LOGIN: 'auth/api/user-mngmnt/v2/login',
+    ENTERPRISE_BACKEND_LOGIN: 'epb/api/enterprise-portal-backend/user/v2/login',
+    VERIFY_USER: 'epb/api/enterprise-portal-backend/user/v1/verify-user',
+    REGISTER_USER_PB: 'epb/api/enterprise-portal-backend/user/v1/create-update-user',
+    GET_ACCOUNT_SUMMARY:'line-details model to be use???',
+    OPEN_API_FETCH_CATEGORY_ID: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/parent/categories?id=',
+    OPEN_API_FETCH_CATEGORIES: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/firstlast/categories',
+    OPEN_API_FETCH_LAYOUT: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/layout',
+    OPEN_API_CREATE_SR: 'epb/api/enterprise-portal-backend/sr-service/v1/openapi/interactions/issue',
+    GET_INVOICE_DETAILS: 'epb/api/enterprise-portal-backend/account/v1/paybill/invoice/search',
+    UMS2_SEND_OTP: 'uma/api/uma/send-login-otp',
+    UMS2_SEND_OTP_REGISTRATION: 'uma/api/uma/send-otp',
+    UMS2_VERIFY_LOGIN_OTP: 'uauth/api/uma/verify-login-otp',
+    UMS2_VERIFY_REGISTRATION_OTP: 'uauth/api/uma/verify-registration-otp',
+    UMS2_LOGIN: 'uauth/api/uma/login',
+    UMS2_REGISTER_USER: 'epb/api/enterprise-portal-backend/user/v2/register-user',
+    UMS2_FORGOT_PASSWORD: 'uma/api/uma/user/forgot-password',
+    UMS2_RESET_PASSWORD: 'uma/api/uma/user/reset-password',
+    UMS2_RE_SEND_OTP: 'uma/api/uma/send-otp',
+    FETCH_USER_DETAILS: 'epb/api/enterprise-portal-backend/user/v1/fetch-user',
+    FETCH_USER_DETAILS_V2: 'epb/api/enterprise-portal-backend/user/v2/fetch-user',
+    FETCH_UMS_DETAILS: 'userm/api/user-mngmnt/users',
+    UMS2_FETCH_UMS_DETAILS: 'uma/api/uma/user',
+}
+
+export const FEATURE_URL = {
+    FETCH_CONFIG : 'epb/api/enterprise-portal-backend/resource/v1/configuration',
+    SAVE_CONFIG : 'epb/api/enterprise-portal-backend/resource/v1/configuration/save',
+    GET_SR_LAYOUT: '/api/enterprise-portal-backend/resource/v1/getSrLayout'
+}
+
+export const MasterDataURl = {
+    GET_ACCOUNT_DETAILS: 'epb/api/enterprise-portal-backend/account/v1/load',
+    GET_LINE_DETAILS: 'epb/api/enterprise-portal-backend/line/v1/search',
+    GET_BILL_SUMMARY: 'epb/api/enterprise-portal-backend/account/v1/bill-summary',
+    GET_LINE_DETAILS_SNAPSHOT: 'epb/api/enterprise-portal-backend/line/v1/snapshot',
+    DOWNLOAD_PAYMENT_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/payment-download',
+    DOWNLOAD_INVOICE: 'epb/api/enterprise-portal-backend/line/v1/snapshot',
+    FETCH_AIRTEL_MONEY_BALANCE: 'epb/api/enterprise-portal-backend/line/v1/airtel-money-balance',
+    FETCH_SUSPENDID_MSISDN: 'epb/api/enterprise-portal-backend/line/v1/fetch-suspended',
+    DOWNLAOD_ACCOUNT_STATEMENT: 'epb/api/enterprise-portal-backend/account/v1/statement-download',
+    FORGOT_PASSWORD: 'userm/api/user-mngmnt/v1/forgot-password',
+    FETCH_BASE_PLAN: 'epb/api/enterprise-portal-backend/line/v1/fetch-plan-details',
+    ACCOUNT_CONTRACT_EXPIRY_DATE: 'epb/api/enterprise-portal-backend/document/v1/fetch-contract-expiry-date',
+    PAYMENT_WAIVER: 'epb/api/enterprise-portal-backend/transaction/v1/waiver/payment',
+    PRODUCT_USAGE_DETAILS: 'epb/api/enterprise-portal-backend/line/v1/fetch-product-usage-details',
+    GET_CATEGORIES: 'epb/api/enterprise-portal-backend/sr-service/v1/firstlast/categories',
+    GET_TOUR_INFO: 'epb/api/enterprise-portal-backend/tour/getTourInfo',
+    UPDATE_TOUR_INFO: 'epb/api/enterprise-portal-backend/tour/updateTourInfo',
+    GET_CONFIGURATION: 'epb/api/enterprise-portal-backend/resource/v2/configuration',
+    GET_BUNDLES:'epb/api/enterprise-portal-backend/product-catalog/v1/fetch-bundles',
+    GET_ALL_LINES:'epb/api/enterprise-portal-backend/line/v1/fatchPlan',
+    PERMANENT_DEACTIVATION: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/Process-file-and-job',
+    FETCH_FILE_DETAILS:'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/fetch-file-content',
+    CREATE_UPDATE_NICKNAME: 'epb/api/enterprise-portal-backend/line/v1/create-update-nickname',
+    BUY_BULK_AIRTIME_SAVEDATA: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/save-file',
+    BULK_UPLOAD_DOWNLOAD: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/download-file',
+    GET_ALL_PLANS: 'epb/api/enterprise-portal-backend/product-catalog/v1/fetch-plans',
+    GET_LINE_DETAILS_MSISDNACCOUNT: 'epb/api/enterprise-portal-backend/line/v1/search/msisdn-through-account',
+    GET_BANNER_CONFIGURATION:'epb/api/enterprise-portal-backend/banner/findAll',
+    SAVE_BANNER_CONFIGURATION: 'epb/api/enterprise-portal-backend/banner/log-activity',
+    LINE_DOWNLOAD:'epb/api/enterprise-portal-backend/line-download/v1/generateReport',
+    GET_OPPORTUNITY_BY_ORDER: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchById',
+    GET_MASTER_DATA: 'epb/api/enterprise-portal-backend/opportunity/v1/fetch/master-details',
+    RAISE_SIM_SWAP: 'epb/api/enterprise-portal-backend/line/v1/sim-swap',
+    GET_SR_LAYOUT_BY_CATEGORY_NAME:'epb/api/enterprise-portal-backend/resource/v1/getSrLayout'
+}
+
+export const InvoicesURl = {
+    GET_INVOICES: 'epb/api/enterprise-portal-backend/account/v1/invoice/search',
+    DOWNLOAD_INVOICES_V1: 'epb/api/enterprise-portal-backend/account/v1/download-bill',
+    DOWNLOAD_INVOICES_V2: 'epb/api/enterprise-portal-backend/account/v2/download-bill',
+    DOWNLOAD_ALL_INVOICES: 'epb/api/enterprise-portal-backend/account/v1/invoice/download'
+}
+
+export const PaymentHistoryURl = {
+    GET_PAYMENT_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/payment/search',
+    DOWNLOAD_PAYMENT_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/payment-download',
+    DOWNLOAD_TRANSACTION_INVOICE: 'epb/api/enterprise-portal-backend/account/v1/download-invoice'
+}
+
+export const OpportunityURl = {
+    GET_OPPORTUNITIES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchAll',
+    GET_SINGLE_OPPORTUNITIES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchById',
+    GET_SERVICE_CATALOG: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchProducts',
+    GET_SERVICES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchServices',
+    GET_CATALOG_BANDWIDTH: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchProducts',
+    GET_COMPANY: 'epb/api/enterprise-portal-backend/opportunity/v1/fetchCompany',
+    UPLOAD_FILE: 'epb/api/enterprise-portal-backend/opportunity/v1/uploadFile',
+    CREATE_OPPORTUNITY: 'epb/api/enterprise-portal-backend/opportunity/v1/create',
+    DOWNLOAD_FILE : 'epb/api/enterprise-portal-backend/opportunity/v1/downloadFile',
+    GET_MASTER_SERVICES: 'epb/api/enterprise-portal-backend/opportunity/v1/fetch/master-services'
+}
+
+
+export const CSURl = {
+    GET_TICKET_HISTORY: 'epb/api/enterprise-portal-backend/sr-service/v1/tickets',
+}
+
+export const APPLICATION_URL = {
+    
+    GET_CATEGORIES: 'epb/api/enterprise-portal-backend/sr-service/v1/firstlast/categories',
+    GET_LAYOUT: 'epb/api/enterprise-portal-backend/sr-service/v1/layout',
+    GET_TICKET_HISTORY: 'epb/api/enterprise-portal-backend/sr-service/v1/tickets',
+    CREATE_SR: 'epb/api/enterprise-portal-backend/sr-service/v1/interactions/issue',
+    //GET_CATEGORY_HEIRARCHY: 'epb/api/enterprise-portal-backend/sr-service/v1/parent/categories?id=',
+    GET_ISSUE_DETAILS: 'epb/api/enterprise-portal-backend/sr-service/v1/issue/history',
+    GET_ACCOUNT_DETAILS: 'epb/api/enterprise-portal-backend/account/v1/load',
+    GET_BILL_SUMMARY: 'epb/api/enterprise-portal-backend/account/v1/bill-summary',
+    GET_ACCOUNT_STATEMENT: 'epb/api/enterprise-portal-backend/account/v1/statement',
+    GET_SELF_SERVICE_HISTORY: 'epb/api/enterprise-portal-backend/self-service/v1/fetch-history',
+    GET_TRANSACTION_HISTORY: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/transaction-history',
+    GET_LINE_DETAILS: 'epb/api/enterprise-portal-backend/line/v1/search',
+    GET_LINE_COUNT: 'epb/api/enterprise-portal-backend/line/v1/line-count',
+    SAVE_DOCUMENT_INFO: 'epb/api/enterprise-portal-backend/document/v1/add',
+    GET_DOCUMENT_LIST: 'epb/api/enterprise-portal-backend/document/v1/fetch',
+    DISABLE_DOCUMENT: 'epb/api/enterprise-portal-backend/document/v1/disable',
+    GET_MANAGE_SERVICES: 'epb/api/enterprise-portal-backend/resource/v1/get-manage-services',
+    CREATE_CHILD_USER: 'userm/api/user-mngmnt/v2/user/create',
+    CREATE_UPDATE_CHILD_USER_PB: 'epb/api/enterprise-portal-backend/user/v1/create-update-child-user',
+    DISABLE_CHILD_USER_PB: 'epb/api/enterprise-portal-backend/user/v1/disable-enable-child-user',
+    FETCH_CHILD_USER: 'epb/api/enterprise-portal-backend/user/v1/fetch-all-child-users',
+    GET_ALL_NOTIFICATION: 'epb/api/enterprise-portal-backend/notification/v1/fetch-all-notifications',
+    GET_NOTIFICATION_STATUS: 'epb/api/enterprise-portal-backend/notification/v1/mark-notification',
+    PERMANENT_DEACTIVATION: 'epb/api/enterprise-portal-backend/line/v1/msisdn/deactivate',
+    TEMPORARY_SUSPENSION: 'epb/api/enterprise-portal-backend/line/v1/suspend-msisdn',
+    FETCH_SUSPENDID_MSISDN: 'epb/api/enterprise-portal-backend/line/v1/fetch-suspended',
+    CANCEL_TEMPORARY_SUSPENSION: 'epb/api/enterprise-portal-backend/line/v1/cancel-suspension',
+    GET_ACCOUNT_TRX_HISTORY: 'epb/api/enterprise-portal-backend/account/v1/statement/top-n-lines',
+    APPLY_DND: 'epb/api/enterprise-portal-backend/line/v1/get-dnd-status?msisdn=',
+    APPLY_DND_ACTIVATE: 'epb/api/enterprise-portal-backend/line/v1/activate-dnd',
+    LOGOUT_URL:'api/v1/user/logout',
+    DOWNLOAD_TRANSACTION: 'epb/api/enterprise-portal-backend/buy-bulk-product/v1/download-file',
+    DOWNLOAD_ALL_TRANSACTION: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/download-transaction',
+    FETCH_FILE_DETAILS:'epb/api/enterprise-portal-backend/buy-bulk-product/v1/fetch-file-content',
+    FETCH_SINGLE_FILE_DETAILS:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/record-status',
+    BULK_UPLOAD_DOWNLOAD: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/download-file',
+    LOAD_DOWNLOAD_REQUEST: 'epb/api/enterprise-portal-backend/line-download/v1/getAllReportStatus',
+    CREATE_UPDATE_CHILD_USER_PB_V2: 'epb/api/enterprise-portal-backend/user/v2/create-update-child-user',
+    DISABLE_CHILD_USER_PB_V2: 'epb/api/enterprise-portal-backend/user/v1/disable-enable-child-user',
+    FETCH_CHILD_USER_V2: 'epb/api/enterprise-portal-backend/user/v2/fetch-all-child-users',
+    DOWNLOAD_FILE:'epb/api/enterprise-portal-backend/line-download/v1/downloadReport'
+    }
+
+export const  RENDER_URL = {
+  UPLOAD_FILE : 'epb/api/enterprise-portal-backend/file/v2/upload-multiple-file',
+  DOWNLOAD_FILE : 'dss/v1/download',
+  DOWNLOAD_ALL : 'dss/rest/data/downloadAsZip',
+  USER_SEARCH: 'search/user/search/name',
+  USER_SEARCH_AUUID: 'search/user/search',
+  DELETE_FILE: 'dss/v1/hard-delete/resource_id',
+  UPLOAD_FILE_IN_PB: 'epb/api/enterprise-portal-backend/file/v1/upload-multiple-file',
+  UPLOAD_DEACTIVATION_FILE: 'epb/api/enterprise-portal-backend/bulk-deactivate-msisdn/v1/upload-file'
+}
+
+export const PaymentUrl = {
+    FETCH_PAYMENT_OPTION: 'epb/api/enterprise-portal-backend/transaction/payment-options',
+    FETCH_PAYMENT_OPTION_OLD: 'epb/api/enterprise-portal-backend/transaction/v1/payment-options',
+    INITIATE_BUY_AIRTIME: 'epb/api/enterprise-portal-backend/transaction/v1/initiate',
+    PROCESS_PAYMENTS:'epb/api/enterprise-portal-backend/transaction/v1/process',
+    PROCESS_PAYMENTS_CG:'epb/api/enterprise-portal-backend/transaction/v1/process-cg',
+    FETCH_PAYMENT_STATUS :"epb/api/enterprise-portal-backend/transaction/fetch?txnId=",
+    CHECK_AM_STATUS: 'epb/api/enterprise-portal-backend/transaction/v1/status?tid=',
+    PAYMENT_INITIATE: 'epb/api/enterprise-portal-backend/openapi/transaction/v1/initiate',
+    GET_CARDS: 'epb/api/enterprise-portal-backend/transaction/v1/get-cards',
+    PAYSTACK :'/api/enterprise-portal-backend/transaction/v1/pg-callback/ENTERPRISE_PORTAL/paystack/status?txref=',
+    VERIFY_CARD: 'epb/api/enterprise-portal-backend/transaction/v1/verify-card-details',
+    SEND_OTP:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/process-payment',
+    RESEND_OTP:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/resend-otp',
+    PROCESS_OTP:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/process-otp',
+    CHECK_AIRTIME_BALANCE:'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/query-balance?',
+    PROCESS_FILE: 'epb/api/enterprise-portal-backend/buy-bulk-airtime/v1/Process-file-and-job',
+    CURRENCY_CONVERSION: 'epb/api/enterprise-portal-backend/transaction/v1/currency-conversion'
+  }
+
+  export const PaymentUrlBps = {
+    FETCH_PAYMENT_OPTION: 'bps/api/business-payment/channel/transaction/payment-options',
+    PROCESS_PAYMENTS:'bps/api/business-payment/channel/transaction/v1/process',
+    FETCH_INITIATE_TRANSACTION :"bps/api/business-payment/channel/transaction/v1/fetch-payments",
+    FETCH_PAYMENT_STATUS :"bps/api/business-payment/channel/transaction/v1/fetch?txnId=",
+    CHECK_AM_STATUS: 'bps/api/business-payment/channel/transaction/v1/status?tid=',
+    PAYMENT_INITIATE: 'bps/api/business-payment/channel/transaction/v1/initiate',
+    TRANSACTION_ENQUIRY: 'bps/api/business-payment/channel/transaction/v1/enquiry',
+    SEND_OTP: 'bps/api/business-payment/channel/user/v1/send-otp',
+    VERIFY_OTP: 'bps/api/business-payment/channel/user/v1/verify-otp',
+    RESEND_OTP: 'bps/api/business-payment/channel/user/v1/resend-otp',
+    CHECK_AIRTIME_BALANCE: 'bps/api/business-payment/channel/transaction/v1/query-balance?',
+    PAYSTACK :'bps/api/business-payment/channel/transaction/v1/pg-callback/BUSINESS_PAY/PAYSTACK/status?txref='
+  }
+
+  export const PaymentUrlCpass = {
+    FETCH_PAYMENT_OPTION: 'epb/api/enterprise-portal-backend/CPaaS/transaction/payment-options',
+    PROCESS_PAYMENTS:'epb/api/enterprise-portal-backend/CPaaS/transaction/v1/process',
+    FETCH_INITIATE_TRANSACTION :"epb/api/enterprise-portal-backend/CPaaS/transaction/v1/fetch-payments",
+    FETCH_PAYMENT_STATUS :"epb/api/enterprise-portal-backend/CPaaS/transaction/v1/fetch?txnId=",
+    PAYMENT_INITIATE: 'epb/api/enterprise-portal-backend/CPaaS/transaction/v1/initiate',
+    TRANSACTION_ENQUIRY: 'epb/api/enterprise-portal-backend/CPaaS/transaction/v1/enquiry'
+  }

@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Airtel Business App
+
+Production-grade mobile-first SaaS built with Next.js 16, Capacitor, Tailwind CSS, and Framer Motion.
+
+## Tech Stack
+
+- **Next.js 16** (App Router, static export)
+- **TypeScript**
+- **Tailwind CSS 4**
+- **Framer Motion**
+- **Capacitor** (Android & iOS)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view in the browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+Outputs static files to `out/` for Capacitor.
 
-To learn more about Next.js, take a look at the following resources:
+## Capacitor (Native Apps)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Build web assets**: `npm run build`
+2. **Sync to native**: `npx cap sync`
+3. **Run on device**:
+   - Android: `npx cap run android`
+   - iOS: `npx cap run ios`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Or open in IDE:
+- Android: `npx cap open android`
+- iOS: `npx cap open ios`
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for design system, folder structure, and architecture decisions.

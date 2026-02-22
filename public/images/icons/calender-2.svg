@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16.4" height="14.945" viewBox="0 0 16.4 14.945">
+  <g id="Layer" transform="translate(0.2 0.2)">
+    <g id="Vrstva_98" data-name="Vrstva 98">
+      <path id="Path_72" data-name="Path 72" d="M14.818,3.455h-.727V2.727a.727.727,0,0,0-1.455,0v.727H5.364V2.727a.727.727,0,0,0-1.455,0v.727H3.182A2.182,2.182,0,0,0,1,5.636v8.727a2.182,2.182,0,0,0,2.182,2.182H14.818A2.182,2.182,0,0,0,17,14.364V5.636a2.182,2.182,0,0,0-2.182-2.182ZM2.455,5.636a.727.727,0,0,1,.727-.727H14.818a.727.727,0,0,1,.727.727v.727H2.455Zm13.091,8.727a.727.727,0,0,1-.727.727H3.182a.727.727,0,0,1-.727-.727V7.818H15.545Z" transform="translate(-1 -2)" fill="#1d2634" stroke="#fff" stroke-width="0.4"/>
+      <rect id="Rectangle_4" data-name="Rectangle 4" width="2.182" height="2.182" rx="0.8" transform="translate(2.909 7.273)" fill="#1d2634" stroke="#fff" stroke-width="0.4"/>
+      <rect id="Rectangle_5" data-name="Rectangle 5" width="2.182" height="2.182" rx="0.8" transform="translate(6.545 7.273)" fill="#1d2634" stroke="#fff" stroke-width="0.4"/>
+    </g>
+  </g>
+</svg>
