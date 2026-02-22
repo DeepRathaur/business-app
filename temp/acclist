@@ -1,0 +1,598 @@
+"use client";
+
+import { useAccount } from "@/context/AccountContext";
+import { useAccountSearch, useOutsideClick, useTranslate } from "@/hooks";
+import { AccountDetailsModel } from "@/shared/models";
+import React, { useCallback, useId, useState } from "react";
+import Image from "next/image";
+import { AccountItem } from "@/shared/components/account-list/AccountSelection";
+import DropdownView from "./DropdownView";
+import MultiSelectDropdown from "@/shared/components/select-dropdown/SelectDropdown";
+import { motion, AnimatePresence } from "framer-motion";
+import AccountListSkeleton from "@/shared/skelton/AccountListSkeleton";
+import { Navigation } from "@/core/constant";
+import { useRouter } from "next/navigation";
+
+type AccountListProps = {
+  variant?: "header" | "dropdown";
+  onSelect?: (accountNo: string | string[]) => void;
+  className?: string;
+  field?: any;
+  value?: string | string[];
+  onChange?: (e: { target: { value: string | string[] } }) => void;
+};
+
+function clsx(...classes: (string | false | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+export function AccountList({
+  variant = "header",
+  onSelect,
+  className,
+  field,
+  value,
+  onChange,
+}: AccountListProps) {
+  const {
+    ecareaccounts,
+    selectedIndex,
+    select,
+    selected,
+    loadMore,
+    isLoadingMore,
+    hasMore,
+  } = useAccount();
+
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const filtered = useAccountSearch(ecareaccounts, query);
+  const listId = useId();
+  const close = useCallback(() => setOpen(false), []);
+  const containerRef = useOutsideClick<HTMLDivElement>(close);
+  const t = useTranslate();
+  const router = useRouter();
+  
+  if (!ecareaccounts.length) {
+    return (
+      <AccountListSkeleton/>
+    );
+  }
+
+  /** ─────────────────────────────
+   *  DROPDOWN VARIANT (used in forms)
+   *  ───────────────────────────── */
+  if (variant === "dropdown") {
+    const component = field?.attr?.multiple ? (
+      <MultiSelectDropdown
+        options={filtered?.map((data: AccountDetailsModel) => ({
+          key: data.accountNo,
+          value: `${data.accountName} (${data.accountNo})`,
+        }))}
+        onChange={
+          onChange as (e: { target: { value: string | string[] } }) => void
+        }
+        isMulti={true}
+        value={value as string[]}
+        onSelect={onSelect}
+        hasMore={hasMore}
+        loadMore={loadMore}
+        isLoadingMore={isLoadingMore}
+      />
+    ) : (
+      <DropdownView onSelect={onSelect} className={className} />
+    );
+    return component;
+  }
+
+
+  const onViewAccount = () => {
+    router.push(Navigation.INDIVIDUAL_ACCOUNT);
+  };
+
+  /** ─────────────────────────────
+   *  HEADER VARIANT (top dark bar + bottom sheet)
+   *  ───────────────────────────── */
+  return (
+    <>
+      {/* Header Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="fixed w-full"
+      >
+        <section
+          className="flex items-center bg-slate-900 px-4 py-2.5 fixed relative w-full rounded-b-lg"
+        >
+          <div className="flex flex-1 flex-wrap gap-x-1 text-sm text-white">
+            <span className="font-medium">
+              {selected
+                ? `${selected.accountName} (${selected.accountNo})`
+                : "Select account"}
+            </span>
+          </div>
+
+          <span className="text-base text-slate-100">
+            <Image
+              src="/images/icons/chevron-down.svg"
+              alt="Dropdown"
+              width={12}
+              height={12}
+              className="ml-1"
+            />
+          </span>
+        </section>
+      </button>
+
+      {/* Bottom Sheet + Overlay with Framer Motion */}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              className="fixed inset-0 z-[999] bg-[#00000094]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={close} // tap outside to close
+            />
+
+            {/* Bottom sheet */}
+            <motion.div
+              ref={containerRef}
+              className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden"
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 380,
+                damping: 28,
+              }}
+            >
+              {/* Sheet container */}
+              <div className="bg-white shadow-lg rounded-t-[20px] max-h-[60vh] flex flex-col">
+                {/* Drag handle (fixed) */}
+                <div className="flex justify-center pt-1 pb-1">
+                  <div className="h-[5px] w-[50px] rounded-full bg-gray-300" />
+                </div>
+
+                {/* Header row (fixed) */}
+                <div className="flex items-center justify-between px-4 pt-2 pb-3">
+                  <h4 className="text-sm font-semibold text-[#1F2436]">
+                    {t("ENTERPRISE_USER_DASHBOARD.SELECT")}{" "}
+                    {t("KAM_DASHBOARD.ACCOUNTS")}
+                  </h4>
+
+                  <motion.button
+                    onClick={close}
+                    aria-label="Close"
+                    whileTap={{ scale: 0.85, rotate: 90 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  >
+                    <Image
+                      src="/images/icons/CloseIcon_black.svg"
+                      alt="Close"
+                      width={20}
+                      height={20}
+                      className=""
+                    />
+                  </motion.button>
+                </div>
+
+                {/* Scrollable list area */}
+                <div className="flex-1 overflow-y-auto space-y-2 pb-3">
+                  {filtered.map((acc, index) => {
+                    const idx = ecareaccounts.findIndex(
+                      (a) => a.accountNo === acc.accountNo
+                    );
+                    const isLast = index === filtered.length - 1;
+
+                    return (
+                      <React.Fragment key={index + acc.accountNo}>
+                        <AccountItem
+                          acc={acc}
+                          active={idx === selectedIndex}
+                          onClick={() => {
+                            select(idx);
+                            close();
+                            onViewAccount();
+                          }}
+                        />
+                        {!isLast && (
+                          <hr className="border-t border-gray-200 mx-4 mb-2" />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                  {hasMore && (
+                    <div className="w-full px-4 pb-4">
+                      <motion.button
+                        onClick={loadMore}
+                        disabled={isLoadingMore}
+                        whileTap={isLoadingMore ? {} : { scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-600 border border-gray-300 rounded-md"
+                      >
+                        {isLoadingMore ? (
+                          <>
+                            <svg
+                              className="animate-spin h-4 w-4 text-gray-600"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                d="M4 12a8 8 0 018-8v8H4z"
+                              ></path>
+                            </svg>
+                            {t("ENTERPRISE_USER_DASHBOARD.LOADING")}...
+                          </>
+                        ) : (
+                          "Load More"
+                        )}
+                      </motion.button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+
+
+
+
+'use client';
+import React, { useState, useRef, useEffect } from 'react';
+
+type Option = {
+  key: string;
+  value: string;
+};
+
+type MultiSelectDropdownProps = {
+  options: Option[] | undefined;
+  onChange: (e: { target: { value: string[] } }) => void;
+  isMulti?: boolean; // true for multi-select, false for single-select
+  value: string[],
+  onSelect?: (accountNo: string | string[]) => void;
+  hasMore?: boolean,
+  loadMore?: (() => void),
+  isLoadingMore?: boolean
+};
+
+const MultiSelectDropdown = ({
+  options,
+  onChange,
+  isMulti = true,
+  value,
+  onSelect,
+  hasMore,
+  loadMore,
+  isLoadingMore
+}: MultiSelectDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>(value);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    onChange( {
+        target: {value: selected}
+      }
+    );
+    onSelect?.(selected)
+  }, [selected])
+
+  const toggleOption = (e: any, value: string) => {
+    if (isMulti) {
+        setSelected((prev) =>
+            prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+          );
+
+    } else {
+        setSelected([value]);
+      setIsOpen(false);
+    }
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="w-full mt-6" ref={dropdownRef}>
+
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full border border-gray-300 rounded px-4 py-2 bg-white text-left"
+        >
+          {selected.length > 0 ? selected.join(', ') : 'Select options'}
+        </button>
+
+        {isOpen && (
+          <div className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+            {options?.map((option) => {
+              const isSelected = selected.includes(option.key);
+              return (
+                <div
+                  key={option.key}
+                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  {isMulti ? (
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => toggleOption(e, option.key)}
+                      className="mr-2"
+                    />
+                  ) : null}
+                  <span
+                    onClick={(e) => !isMulti && toggleOption(e, option.value)}
+                    className="flex-grow"
+                  >
+                    {option.value}
+                  </span>
+                </div>
+              );
+            })}
+
+          {hasMore && (
+                  <div className="w-full px-4 pb-4">
+                    <button
+                      onClick={loadMore}
+                      disabled={isLoadingMore}
+                      className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-600 border border-gray-300 rounded-md"
+                    >
+                      {isLoadingMore ? (
+                        <>
+                          <svg
+                            className="animate-spin h-4 w-4 text-gray-600"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              d="M4 12a8 8 0 018-8v8H4z"
+                            ></path>
+                          </svg>
+                          Loading...
+                        </>
+                      ) : (
+                        "Load More"
+                      )}
+                    </button>
+                  </div>
+                  )}
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+};
+
+export default MultiSelectDropdown;
+
+
+
+
+"use client"
+import React, { useEffect, useMemo, useState } from "react";
+import { useAccountSearch, useOutsideClick } from "@/hooks";
+import { useAccount } from "@/context/AccountContext";
+type DropdownViewProps = {
+  onSelect?: (accountNo: string) => void;
+  className?: string;
+};
+
+const DropdownView = ({ onSelect, className }: DropdownViewProps) => {
+  const {
+    ecareaccounts,
+    selectedIndex,
+    select,
+    selected,
+    loadMore,
+    isLoadingMore,
+    hasMore,
+  } = useAccount();
+
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const containerRef = useOutsideClick<HTMLDivElement>(() => setOpen(false));
+
+  const filtered = useAccountSearch(ecareaccounts, query);
+
+  const handleSelect = (acc: any, idx: number) => {
+    select(idx);
+    onSelect?.(acc.accountNo);
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const idx = ecareaccounts.findIndex((a) => a.accountNo === selected?.accountNo);
+    handleSelect(selected, idx);
+  }, []);
+
+  return (
+    <div ref={containerRef} className={`relative w-full ${className}`}>
+      <button
+        onClick={() => setOpen((prev) => !prev)}
+        className="w-full border border-gray-300 p-3 rounded bg-white text-left text-black flex justify-between items-center"
+      >
+        {selected ? (
+          <span>{selected.accountNo} - {selected.accountName}</span>
+        ) : (
+          <span className="text-gray-400">-- Select Account --</span>
+        )}
+        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+          <input
+            type="text"
+            placeholder="Search account..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full px-4 py-2 border-b border-gray-200 text-sm focus:outline-none"
+          />
+          <ul>
+            {filtered.map((acc, index) => {
+              const idx = ecareaccounts.findIndex((a) => a.accountNo === acc.accountNo);
+              return (
+                <li
+                  key={acc.accountNo}
+                  onClick={() => handleSelect(acc, idx)}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                    idx === selectedIndex ? "bg-gray-200 font-semibold" : ""
+                  }`}
+                >
+                  {acc.accountNo} - {acc.accountName}
+                </li>
+              );
+            })}
+            {hasMore && (
+              <li className="px-4 py-2 text-center">
+                <button
+                  onClick={loadMore}
+                  disabled={isLoadingMore}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  {isLoadingMore ? "Loading..." : "Load More"}
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DropdownView;
+
+
+
+
+import { AccountDetailsModel } from "@/shared/models";
+import { memo } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+
+function clsx(...classes: (string | false | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+export const AccountItem = memo(function AccountItem({
+  acc,
+  active,
+  onClick,
+}: {
+  acc: AccountDetailsModel;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <motion.div
+      role="option"
+      aria-selected={active}
+      onClick={onClick}
+      className="flex cursor-pointer items-start px-4 py-1"
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      {/* Text block */}
+      <div className="flex-1">
+        {/* Account No + selected pill */}
+        <p
+          className={clsx(
+            "flex items-center gap-2 text-sm font-color-text font-extrabold"
+          )}
+        >
+          {acc.accountNo}
+
+          {active && (
+            <span
+              className="
+                rounded-[2px]
+                bg-[#0AAF69]
+                px-2
+                py-[2px]
+                text-[10px]
+                font-medium
+                text-white
+              "
+            >
+              selected
+            </span>
+          )}
+        </p>
+
+        {/* Account Name */}
+        <p
+          className={clsx(
+            "mt-0.5 text-xs",
+            active ? "font-color-text font-normal" : "font-color-text"
+          )}
+        >
+          {acc.accountName}
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        aria-label="View billing details"
+        className="text-lg text-slate-400"
+        onClick={onClick}
+      >
+        <Image
+          src="/images/icons/arrow_icon.svg"
+          alt="Dropdown"
+          width={20}
+          height={20}
+          className="cursor-pointer"
+        />
+
+      </button>
+
+
+    </motion.div>
+  );
+});

@@ -1,59 +1,147 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-
-const defaultServices = [
-  { icon: "/images/icons/airtel_money.svg", label: "Mobile", path: "/services?type=MOBILE" },
-  { icon: "/images/icons/M2M.svg", label: "M2M", path: "/services?type=M2M" },
-  { icon: "/images/icons/billing.svg", label: "Fixedline", path: "/services?type=FIXEDLINE" },
-  { icon: "/images/icons/buy-product.svg", label: "FTTX", path: "/services?type=FTTX" },
-  { icon: "/images/icons/ProductsServices.svg", label: "FiberCo", path: "/services?type=FIBERCO" },
-];
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { accountService } from "@/core/services/account.service";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
+import { useInterModuleNavigation } from "@/hooks/useInterModuleNavigation";
+import { mapServiceTypes } from "@/lib/utils/service-mapper";
+import { getServiceCategoryTabs } from "@/lib/utils/service-tabs";
+import { Navigation } from "@/core/constants/navigation";
 
 interface ServicePageProps {
   configuration?: Record<string, unknown>;
 }
 
-/**
- * ServicePage - Grid of service quick links
- * Uses config layout if available; otherwise default services
- */
 export default function ServicePage({ configuration }: ServicePageProps) {
-  const services = defaultServices;
+  const router = useRouter();
+  const [serviceTypesArr, setServiceTypes] = useState<{ label: string; value: string }[]>([]);
+  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
+  const productType = (configuration?.ProductType ?? []) as unknown[];
+  const role = accountService.getEnterPriseRole();
+  const { toService } = useInterModuleNavigation();
+
+  const {
+    getAllServiceTypes,
+    getServiceTypeListByCategory,
+    setCurrentServiceType,
+  } = useServiceTypes({ productType });
+
+  useEffect(() => {
+    const types = getAllServiceTypes();
+    setServiceTypes(types);
+  }, [getAllServiceTypes]);
+
+  const tabServiceCategory = getServiceCategoryTabs(
+    configuration,
+    role ?? undefined,
+    serviceTypesArr
+  );
+  const services = mapServiceTypes(tabServiceCategory);
+
+  const pageSize = 4;
+  const totalPages = Math.ceil(services.length / pageSize);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const pagedServices = services.slice(
+    currentPage * pageSize,
+    currentPage * pageSize + pageSize
+  );
+
+  const goToPage = (page: number) => {
+    if (page < 0 || page >= totalPages) return;
+    setCurrentPage(page);
+  };
+
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const offsetX = info.offset.x;
+    const velocityX = info.velocity.x;
+    const swipeThreshold = 50;
+    const velocityThreshold = 300;
+
+    if (offsetX < -swipeThreshold || velocityX < -velocityThreshold) {
+      goToPage(currentPage + 1);
+    }
+    if (offsetX > swipeThreshold || velocityX > velocityThreshold) {
+      goToPage(currentPage - 1);
+    }
+  };
+
+  const onNavigate = () => {
+    router.push(Navigation.SERVICES);
+  };
+
+  const handleCategoryClick = (key: string) => {
+    setCurrentCategory(key);
+    setCurrentServiceType(key);
+    toService(key);
+  };
 
   return (
-    <div className="px-2.5 py-4">
-      <h3 className="text-sm font-semibold text-white mb-3">Manage Services</h3>
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="grid grid-cols-3 gap-3"
-      >
-        {services.map((s, i) => (
-          <Link
-            key={s.label}
-            href={s.path}
-            className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
+    <section className="mt-5 rounded-xl bg-white px-4 pb-3 pt-3 mx-2.5 shadow-lg">
+      <div className="mb-1.5 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-neutral-900">Services</h2>
+        <motion.button
+          type="button"
+          aria-label="View all services"
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="text-lg text-slate-400"
+          onClick={onNavigate}
+        >
+          <Image
+            src="/images/icons/arrow_icon.svg"
+            alt="Dropdown"
+            width={20}
+            height={20}
+          />
+        </motion.button>
+      </div>
+
+      <div className="pt-2 overflow-hidden">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={currentPage}
+            className="flex justify-between gap-2"
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -50, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
           >
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-2">
-              <Image
-                src={s.icon}
-                alt=""
-                width={24}
-                height={24}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-            </div>
-            <span className="text-xs font-medium text-white">{s.label}</span>
-          </Link>
-        ))}
-      </motion.div>
-    </div>
+            {pagedServices.map((s) => (
+              <motion.button
+                key={s.label}
+                type="button"
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex flex-1 flex-col items-center"
+                onClick={() => handleCategoryClick(s.key)}
+              >
+                <div
+                  className={`mb-1 flex h-10 w-10 items-center justify-center rounded-lg ${
+                    s.key === currentCategory ? "bg-red-600" : "bg-[#F0F6FF]"
+                  }`}
+                >
+                  <Image
+                    src={s.key === currentCategory && s.activeIcon ? s.activeIcon : s.icon}
+                    alt={s.label}
+                    width={24}
+                    height={24}
+                    className="h-6 w-6 object-contain"
+                  />
+                </div>
+                <span className="text-xs text-neutral-900">{s.label}</span>
+              </motion.button>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </section>
   );
 }

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { LineDetailsModel } from "@/shared/models";
-import { useInterModuleNavigation } from "@/hooks/useInterModuleNavigation";
+import { useInterModuleNavigationService } from "@/hooks/useInterModuleNavigation";
 
 interface ServiceListProps {
   items: LineDetailsModel[];

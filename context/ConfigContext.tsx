@@ -73,23 +73,26 @@ function deriveFromConfig(config: unknown): {
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Start false: fetch in background, don't block UI
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
-    const service = new ConfigurationService();
-    service
-      .fetchConfiguration("ENT_MOBILE_PORTAL", "public")
-      .then((data) => {
-        setConfig(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const id = requestAnimationFrame(() => {
+      const service = new ConfigurationService();
+      service
+        .fetchConfiguration("ENT_MOBILE_PORTAL", "public")
+        .then((data) => {
+          setConfig(data);
+          setError(null);
+        })
+        .catch((err) => {
+          setError(err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const configValue = useMemo(() => {

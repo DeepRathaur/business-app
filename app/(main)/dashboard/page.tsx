@@ -3,7 +3,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import AppHeader from "@/components/layout/AppHeader";
 import { useConfig } from "@/context/ConfigContext";
 import { useAccount } from "@/context/AccountContext";
 import { accountService } from "@/core/services/account.service";
@@ -14,7 +13,7 @@ import { ResponseCodeEnum, PaymentModeEnum, TransactionTypeEnum } from "@/shared
 import type { TransactionInfoModel } from "@/shared/models";
 import type { BillSummaryDisplay } from "@/hooks/useBillSummary";
 import type { BannerModel } from "@/shared/models";
-import AccountList from "@/components/dashboard/AccountList";
+import { AccountList } from "@/components/account-list/AccountList";
 import BillingWidget from "@/components/dashboard/BillingWidget";
 import BannerSlider from "@/components/dashboard/BannerSlider";
 import BannerSliderSkeleton from "@/components/dashboard/BannerSliderSkeleton";
@@ -122,10 +121,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <AppHeader title="Dashboard" />
-      <div className="flex-1 px-0 py-4">
-        <AccountList />
-
+      <AccountList />
+      <div className="flex-1 px-0 pt-12 pb-4">
         {!configuration && configLoading ? (
           <TrackDetailsSkeleton />
         ) : configuration ? (

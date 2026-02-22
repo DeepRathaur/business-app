@@ -215,6 +215,7 @@
         "BANK_DETAILS" : "Coordonnées bancaires"
     },
     "ENTERPRISE_USER_DASHBOARD" : {
+        "SELECT" : "Sélectionner",
         "ACCOUNT_OVERVIEW" : "Aperçu du compte",
         "ACCOUNT_DETAILS" : "Détails du compte",
         "PLACE_A_PRODUCT_PURCHASE_REQUEST" : "Placez une commande",

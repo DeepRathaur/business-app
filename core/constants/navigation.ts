@@ -8,4 +8,6 @@ export const Navigation = {
   PAYMENT_LANDING: "/paybill",
   MANAGE_USERS: "/manage-users",
   SUPPORT: "/support",
+  SERVICES: "/services",
+  INDIVIDUAL_ACCOUNT: "/account",
 } as const;

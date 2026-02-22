@@ -48,6 +48,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const handleAuthChanged = () => {
+      const t = accountService.getAccessToken();
+      setToken(t);
+    };
+    window.addEventListener("auth-changed", handleAuthChanged);
+    return () => window.removeEventListener("auth-changed", handleAuthChanged);
+  }, []);
+
+  useEffect(() => {
     setAuthTokenProvider(getToken);
     return () => clearAuthTokenProvider();
   }, [getToken]);

@@ -10,6 +10,8 @@ import { getApiBaseUrl } from "./config";
 
 const isProd = process.env.NEXT_PUBLIC_IS_PROD === "true";
 
+const EXTERNAL_ORIGINS = ["https://abcliteuat.airtel.com.ng", "http://abcliteuat.airtel.com.ng"];
+
 const axiosClient = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 60000,
@@ -19,9 +21,17 @@ const axiosClient = axios.create({
   },
 });
 
-// Request interceptor: add BFE headers, auth
+// Request interceptor: add BFE headers, auth, and rewrite external API to CORS proxy on localhost
 axiosClient.interceptors.request.use(
   (config) => {
+    if (typeof window !== "undefined" && config.url && /^https?:\/\/localhost(:\d+)?$/.test(window.location.origin)) {
+      const url = config.url.startsWith("http") ? config.url : (config.baseURL || "") + (config.url.startsWith("/") ? config.url : `/${config.url}`);
+      const isExternal = EXTERNAL_ORIGINS.some((o) => url.startsWith(o));
+      if (isExternal && !url.includes("/cors-proxy/")) {
+        config.url = url.replace(/^https?:\/\/[^/]+/, `${window.location.origin}/cors-proxy`);
+        config.baseURL = undefined;
+      }
+    }
     config.headers["opco"] = process.env.NEXT_PUBLIC_OPCO ?? "";
     config.headers["product"] = process.env.NEXT_PUBLIC_PRODUCT ?? "ENTERPRISE_PORTAL";
     config.headers["requestDate"] = Date.now().toString();

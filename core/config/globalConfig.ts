@@ -23,14 +23,23 @@ const BFE_WEB = "/bfe/web";
 
 export function getGlobalConfig(): GlobalConfig {
   if (!instance) {
+    // Use proxy when on localhost to avoid CORS (env opt-in, or auto when page is localhost)
+    const isLocalhost =
+      typeof window !== "undefined" &&
+      /^https?:\/\/localhost(:\d+)?$/.test(window.location.origin);
+    const useCorsProxy =
+      (process.env.NEXT_PUBLIC_USE_CORS_PROXY === "true" || isLocalhost) &&
+      typeof window !== "undefined";
     const prefix = process.env.NEXT_PUBLIC_PROJECT_PREFIX ?? "";
     const customBase = process.env.NEXT_PUBLIC_API_BASE_URL;
     let base =
       customBase ??
       (prefix ? `${prefix}${BFE_WEB}` : "https://api.example.com");
 
-    // Ensure /bfe/web is in the path (required for config/locale APIs)
-    if (!base.includes("/bfe/web")) {
+    // Dev workaround: proxy API via same-origin to avoid CORS (Chrome blocks, Postman works)
+    if (useCorsProxy) {
+      base = `${window.location.origin}/cors-proxy${BFE_WEB}`;
+    } else if (!base.includes("/bfe/web")) {
       base = base.replace(/\/?$/, "") + BFE_WEB;
     }
 

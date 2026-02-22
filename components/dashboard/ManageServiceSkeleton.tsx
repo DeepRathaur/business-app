@@ -5,22 +5,30 @@ import { motion } from "framer-motion";
 
 export default function ManageServiceSkeleton() {
   return (
-    <div className="px-2.5 py-4">
+    <motion.section
+      className="mt-5 rounded-xl bg-white px-4 pb-3 pt-3 mx-2.5 shadow-lg"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+    >
       <motion.div
-        animate={{ opacity: [0.4, 1, 0.4] }}
+        className="h-4 w-32 bg-gray-200 rounded mb-4"
+        animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.2, repeat: Infinity }}
-        className="grid grid-cols-3 gap-3"
-      >
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div
+      />
+      <div className="mt-1 flex justify-between gap-2">
+        {[1, 2, 3, 4].map((i) => (
+          <motion.div
             key={i}
-            className="aspect-square rounded-xl bg-white/10 flex flex-col items-center justify-center gap-2"
+            className="flex flex-1 flex-col items-center"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }}
           >
-            <div className="w-10 h-10 rounded-full bg-white/20" />
-            <div className="h-3 w-12 bg-white/20 rounded" />
-          </div>
+            <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-xl bg-gray-200" />
+            <div className="h-3 w-12 bg-gray-200 rounded" />
+          </motion.div>
         ))}
-      </motion.div>
-    </div>
+      </div>
+    </motion.section>
   );
 }

@@ -220,6 +220,7 @@
         "BANK_DETAILS" : "Bank Details"
     },
     "ENTERPRISE_USER_DASHBOARD" : {
+        "SELECT" : "Select",
         "ACCOUNT_OVERVIEW" : "Account Overview",
         "ACCOUNT_DETAILS" : "Account Details",
         "PLACE_A_PRODUCT_PURCHASE_REQUEST" : "Place a product purchase request",

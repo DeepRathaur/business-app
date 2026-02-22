@@ -30,12 +30,12 @@ export default function PrimaryButton({
 
   const variants = {
     primary:
-      " text-primary hover:bg-white/95 shadow-card",
+      " text-primary hover:bg-red-500/95 shadow-card",
     secondary:
-      "bg-white/20 text-white border border-white/30 hover:bg-white/30",
+      "bg-white/20 text-white border border-white/30 hover:bg-red-500/30",
     outline:
-      "bg-transparent text-white border-2 border-white hover:bg-white/10",
-    ghost: "bg-transparent text-white hover:bg-white/10",
+      "bg-transparent text-white border-2 border-white hover:bg-red-500/10",
+    ghost: "bg-transparent text-white hover:bg-red-500/10",
   };
 
   const sizes = {

@@ -48,6 +48,9 @@ export interface AccountContextValue {
   select: (i: number) => void;
   setAccounts: (accounts: AccountDetailsModel[]) => void;
   totalRecords?: number;
+  loadMore?: () => void;
+  isLoadingMore?: boolean;
+  hasMore?: boolean;
 }
 
 const AccountContext = createContext<AccountContextValue | null>(null);
@@ -95,6 +98,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       select,
       setAccounts,
       totalRecords: state.ecareaccounts.length,
+      loadMore: undefined,
+      isLoadingMore: false,
+      hasMore: false,
     }),
     [state, selected, select, setAccounts]
   );

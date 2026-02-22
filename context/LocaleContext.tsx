@@ -13,7 +13,6 @@ import { LocalStorageKey } from "@/core/constants/localStorage.enum";
 import { getGlobalConfig } from "@/core/config/globalConfig";
 import { localStorageService } from "@/core/services/localStorage.service";
 import { fetchLocaleFromApi } from "@/core/services/language.service";
-import { useConfig } from "@/context/ConfigContext";
 import { staticLocales } from "@/lib/locales/static";
 
 type Translations = Record<string, unknown>;
@@ -40,10 +39,13 @@ function getNested(obj: unknown, path: string): string | null {
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const config = getGlobalConfig();
-  const { loading: configLoading } = useConfig();
+  // Use same initial state on server and client to avoid hydration mismatch.
+  // localStorage is read in useEffect (client-only) after hydration.
   const [currentLanguage, setCurrentLanguage] = useState<string>(config.defaultLanguage);
-  const [translations, setTranslations] = useState<Translations | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [translations, setTranslations] = useState<Translations | null>(
+    () => staticLocales[config.defaultLanguage] ?? staticLocales.en ?? {}
+  );
+  const [loading, setLoading] = useState(false); // Don't block UI; locale API runs in background
   const [apiLoaded, setApiLoaded] = useState(false);
 
   const staticData = useMemo(
@@ -52,10 +54,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   );
 
   const displayTranslations = apiLoaded ? translations : staticData;
-  const localeLoading = configLoading || loading;
 
   const loadTranslationsFromApi = useCallback(async (lang: string) => {
-    if (configLoading) return;
     setLoading(true);
     try {
       const langToUse = lang || config.defaultLanguage;
@@ -78,7 +78,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [config.defaultLanguage, configLoading]);
+  }, [config.defaultLanguage]);
 
   const t = useCallback(
     (key: string): string => {
@@ -100,18 +100,21 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     [loadTranslationsFromApi]
   );
 
+  // Fetch locale from API in background; defer until after first paint so UI renders immediately
   useEffect(() => {
-    if (configLoading) return;
-    const stored = localStorageService.get<string>(LocalStorageKey.LANGUAGE);
-    const langToUse = stored ?? config.defaultLanguage;
-    setCurrentLanguage(langToUse);
-    setTranslations(staticLocales[langToUse] ?? staticLocales.en ?? {});
-    loadTranslationsFromApi(langToUse);
-  }, [configLoading, config.defaultLanguage, loadTranslationsFromApi]);
+    const id = requestAnimationFrame(() => {
+      const stored = localStorageService.get<string>(LocalStorageKey.LANGUAGE);
+      const langToUse = stored ?? config.defaultLanguage;
+      setCurrentLanguage(langToUse);
+      setTranslations(staticLocales[langToUse] ?? staticLocales.en ?? {});
+      loadTranslationsFromApi(langToUse);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [config.defaultLanguage, loadTranslationsFromApi]);
 
   const value = useMemo(
-    () => ({ t, changeLanguage, currentLanguage, translations: displayTranslations, loading: localeLoading }),
-    [t, changeLanguage, currentLanguage, displayTranslations, localeLoading]
+    () => ({ t, changeLanguage, currentLanguage, translations: displayTranslations, loading }),
+    [t, changeLanguage, currentLanguage, displayTranslations, loading]
   );
 
   return (
