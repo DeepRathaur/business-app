@@ -32,7 +32,8 @@ export const UserUrls_extended = {
 export const MasterDataUrls = {
   GET_ACCOUNT_DETAILS: "epb/api/enterprise-portal-backend/account/v1/load",
   GET_BILL_SUMMARY: "epb/api/enterprise-portal-backend/account/v1/bill-summary",
-  GET_BANNER_CONFIGURATION: "epb/api/enterprise-portal-backend/resource/v1/banner-configuration",
+  GET_BANNER_CONFIGURATION:'epb/api/enterprise-portal-backend/banner/findAll',
+  SAVE_BANNER_CONFIGURATION: 'epb/api/enterprise-portal-backend/banner/log-activity',
   GET_LINE_DETAILS: "epb/api/enterprise-portal-backend/line/v1/search",
   GET_LINE_COUNT: "epb/api/enterprise-portal-backend/line/v1/line-count",
 } as const;

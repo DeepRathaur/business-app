@@ -15,10 +15,13 @@ interface AccountListProps {
   variant?: "header" | "dropdown";
   onSelect?: (accountNo: string | string[]) => void;
   className?: string;
+  /** When set, the fixed bar is offset from top (e.g. 48 for a menu bar above) */
+  topOffset?: number;
 }
 
 export function AccountList({
   variant = "header",
+  topOffset,
 }: AccountListProps) {
   const {
     ecareaccounts,
@@ -51,6 +54,7 @@ export function AccountList({
         type="button"
         onClick={() => setOpen((s) => !s)}
         className="fixed w-full z-10"
+        style={topOffset != null ? { top: `${topOffset}px` } : undefined}
       >
         <section className="flex items-center bg-slate-900 px-4 py-2.5 relative w-full rounded-b-lg">
           <div className="flex flex-1 flex-wrap gap-x-1 text-sm text-white min-w-0">

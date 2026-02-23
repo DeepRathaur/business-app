@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { useConfig } from "@/context/ConfigContext";
 import { useAccount } from "@/context/AccountContext";
 import { accountService } from "@/core/services/account.service";
@@ -14,6 +13,7 @@ import type { TransactionInfoModel } from "@/shared/models";
 import type { BillSummaryDisplay } from "@/hooks/useBillSummary";
 import type { BannerModel } from "@/shared/models";
 import { AccountList } from "@/components/account-list/AccountList";
+import MenuDrawer from "@/components/layout/MenuDrawer";
 import BillingWidget from "@/components/dashboard/BillingWidget";
 import BannerSlider from "@/components/dashboard/BannerSlider";
 import BannerSliderSkeleton from "@/components/dashboard/BannerSliderSkeleton";
@@ -23,10 +23,13 @@ import ServicePage from "@/components/dashboard/ServicePage";
 import ManageServiceSkeleton from "@/components/dashboard/ManageServiceSkeleton";
 import ManageService from "@/components/dashboard/ManageService";
 
+const MENU_BAR_HEIGHT = 48;
+
 export default function DashboardPage() {
   const router = useRouter();
   const { config, loading: configLoading } = useConfig();
   const { selected, setAccounts } = useAccount();
+  const [menuOpen, setMenuOpen] = useState(false);
   const configuration = (config as { result?: { public?: Record<string, unknown> } })?.result?.public;
   const [slides, setSlides] = useState<BannerModel[]>([]);
   const [bannerLoading, setBannerLoading] = useState(true);
@@ -121,8 +124,26 @@ export default function DashboardPage() {
 
   return (
     <>
-      <AccountList />
-      <div className="flex-1 px-0 pt-12 pb-4">
+      <header
+        className="fixed top-0 left-0 right-0 z-20 flex h-12 items-center bg-slate-900 px-3"
+        style={{ height: MENU_BAR_HEIGHT }}
+      >
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white hover:bg-white/10 active:bg-white/20"
+          aria-label="Open menu"
+        >
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <span className="flex-1 text-center text-sm font-medium text-white">Dashboard</span>
+        <div className="w-10 shrink-0" />
+      </header>
+      <AccountList topOffset={MENU_BAR_HEIGHT} />
+      <MenuDrawer isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <div className="flex-1 px-0 pt-24 pb-4">
         {!configuration && configLoading ? (
           <TrackDetailsSkeleton />
         ) : configuration ? (
