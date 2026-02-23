@@ -7,6 +7,7 @@ import { useToast } from "@/context/ToastContext";
 import { useLocale } from "@/context/LocaleContext";
 import { accountService } from "@/core/services/account.service";
 import { getUserDetails, getUMSPermission } from "@/core/services/user.service";
+import { ResponseCodeEnum } from "@/core/enum/response-code.enum";
 
 /**
  * useFetchPermission - Runs after OTP verify success
@@ -36,7 +37,10 @@ export function useFetchPermission() {
         getUMSPermission(isUms2),
       ]);
 
-      if (userRes.statusCode !== "SUCCESS") {
+      console.log("userRes", userRes);
+      console.log("umsRes", umsRes);
+
+      if (userRes.statusCode !== ResponseCodeEnum.SUCCESS) {
         const msg = (userRes as { message?: string }).message ?? t("message_constant.SOMETHING_WENT_WRONG");
         throw new Error(msg);
       }
@@ -52,9 +56,10 @@ export function useFetchPermission() {
         accountService.setEnterPriseRole(String(userResult.userType));
       }
 
-      if (umsRes.statusCode === "SUCCESS" && umsRes.result) {
+      if (umsRes.statusCode === ResponseCodeEnum.SUCCESS && umsRes.result) {
         if (isUms2 && umsRes.result.authorities) {
           const names = umsRes.result.authorities.map((a) => a.authority);
+          console.log("names", names);
           accountService.setUMSPermission(names);
         } else if (!isUms2 && umsRes.result.role) {
           const perms: string[] = [];
@@ -76,7 +81,7 @@ export function useFetchPermission() {
         router.replace("/dashboard");
       } else {
         accountService.logout();
-        router.replace("/login");
+        //router.replace("/login");
         showToast(t("message_constant.SOMETHING_WENT_WRONG"), "error");
       }
     } catch (err) {

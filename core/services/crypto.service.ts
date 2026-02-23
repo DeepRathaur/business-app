@@ -1,22 +1,47 @@
 /**
- * Crypto Service - Encryption for login payload
- * When encryption disabled: returns data as-is.
- * When enabled: placeholder (base64) - swap for real RSA/PEM impl as needed.
+ * Crypto Service - AES encrypt/decrypt for localStorage (crypto-js).
+ * Same secret derivation as Project B: navigator props + key for per-key encryption.
  */
 
-import { getGlobalConfig } from "@/core/config/globalConfig";
+import CryptoJS from "crypto-js";
 
 export class CryptoService {
-  async encrypt(data: string): Promise<string> {
-    const isEncrypted = getGlobalConfig().encryption;
-    if (!isEncrypted) {
-      return Promise.resolve(data);
-    }
-    if (typeof window === "undefined") return data;
+  private encryptSecretKey: string;
+
+  constructor() {
+    this.encryptSecretKey =
+      typeof window !== "undefined"
+        ? `${window.navigator.appVersion}${window.navigator.appCodeName}${window.navigator.platform}${window.navigator.vendor}${window.navigator.userAgent}`
+        : "";
+  }
+
+  encryptData<T>(data: T, key: string): string | undefined {
     try {
-      return btoa(encodeURIComponent(data));
-    } catch {
-      return data;
+      if (key) {
+        return CryptoJS.AES.encrypt(
+          JSON.stringify(data),
+          `${this.encryptSecretKey}?key=${key}`
+        ).toString();
+      }
+    } catch (e) {
+      console.error("CryptoService encryptData:", e);
     }
+    return undefined;
+  }
+
+  decryptData<T>(data: string, key: string): T | null {
+    try {
+      if (key) {
+        const bytes = CryptoJS.AES.decrypt(
+          data,
+          `${this.encryptSecretKey}?key=${key}`
+        );
+        const str = bytes.toString(CryptoJS.enc.Utf8);
+        if (str) return JSON.parse(str) as T;
+      }
+    } catch (e) {
+      console.error("CryptoService decryptData:", e);
+    }
+    return null;
   }
 }

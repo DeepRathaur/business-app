@@ -49,7 +49,6 @@ export class AuthService {
     options?: { isEncrypted?: boolean; enableUms2?: boolean }
   ): Promise<LoginResponse> {
     const isEncrypted = options?.isEncrypted && "record" in input;
-    const enableUms2 = this.getEnableUms2(options?.enableUms2);
 
     const url = isEncrypted
       ? API_ENDPOINTS.ENTERPRISE_BACKEND_LOGIN

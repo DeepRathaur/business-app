@@ -28,6 +28,11 @@ export default function BillingWidget({
   const { billSummary, loading } = useBillSummary(accountNo);
   const { t } = useLocale();
 
+  const showOverdueAmount =
+    billSummary != null &&
+    billSummary.totalOverdueAmount != null &&
+    Number(billSummary.totalOverdueAmount) > 0;
+
   if (loading) {
     return (
       <motion.section
@@ -96,28 +101,54 @@ export default function BillingWidget({
                 : "--"}
             </span>
           </div>
-          <div className="mt-1 text-[11px]">
-            <span className="mr-1 text-slate-500">Due Date</span>
-            <br />
-            <span className="font-medium">
-              {billSummary?.dueDate ? formatDate(billSummary.dueDate) : "--"}
-            </span>
-          </div>
+          {showOverdueAmount && (
+            <div className="mt-1 text-[11px]">
+              <span className="mr-1 text-slate-500">
+                {t("BILLING_DETAILS.OVERDUE_AMOUNT")}
+              </span>
+              <br />
+              <span className="font-medium text-red-500">
+                {billSummary?.currency}{" "}
+                {billSummary?.totalOverdueAmount != null
+                  ? numberWithCommas(billSummary.totalOverdueAmount)
+                  : "--"}
+              </span>
+            </div>
+          )}
         </div>
 
-        {billSummary && (
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="mt-6 whitespace-nowrap rounded-lg bg-slate-900 px-7 py-3.5 text-xs font-medium text-white"
-            onClick={() =>
-              onEventHandler(actionType.PAY_TOTAL_OUTSTANDING, billSummary)
-            }
-          >
-            {t("BUTTONS.PAY")}
-          </motion.button>
-        )}
+        <div className="flex flex-col items-end gap-1">
+          {showOverdueAmount && billSummary?.dueDate && (
+            <div className="text-right text-[11px]">
+              <span className="text-slate-500">Due Date</span>
+              <br />
+              <span className="font-medium">
+                {formatDate(billSummary.dueDate)}
+              </span>
+            </div>
+          )}
+          {billSummary && (
+            <div className="flex items-center gap-2">
+              {showOverdueAmount && (
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full bg-red-500"
+                  aria-hidden
+                />
+              )}
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="whitespace-nowrap rounded-lg bg-slate-900 px-7 py-3.5 text-xs font-medium text-white"
+                onClick={() =>
+                  onEventHandler(actionType.PAY_TOTAL_OUTSTANDING, billSummary)
+                }
+              >
+                {t("BUTTONS.PAY")}
+              </motion.button>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

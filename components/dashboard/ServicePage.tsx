@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { accountService } from "@/core/services/account.service";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
-import { useInterModuleNavigation } from "@/hooks/useInterModuleNavigation";
+// import { useInterModuleNavigation } from "@/hooks/useInterModuleNavigation";
 import { mapServiceTypes } from "@/lib/utils/service-mapper";
 import { getServiceCategoryTabs } from "@/lib/utils/service-tabs";
 import { Navigation } from "@/core/constants/navigation";
@@ -21,7 +21,7 @@ export default function ServicePage({ configuration }: ServicePageProps) {
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
   const productType = (configuration?.ProductType ?? []) as unknown[];
   const role = accountService.getEnterPriseRole();
-  const { toService } = useInterModuleNavigation();
+  // const { toService } = useInterModuleNavigation();
 
   const {
     getAllServiceTypes,
@@ -76,7 +76,7 @@ export default function ServicePage({ configuration }: ServicePageProps) {
   const handleCategoryClick = (key: string) => {
     setCurrentCategory(key);
     setCurrentServiceType(key);
-    toService(key);
+    // toService(key);
   };
 
   return (

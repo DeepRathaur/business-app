@@ -8,7 +8,7 @@ import { getFullUrl } from "@/core/api/config";
 import { UserUrls_extended } from "@/core/constants/api-urls";
 
 export interface FetchUserResponse {
-  statusCode?: string;
+  statusCode?: number;
   result?: {
     email?: string;
     userPermissions?: unknown[];
@@ -20,7 +20,7 @@ export interface FetchUserResponse {
 }
 
 export interface UMSDetailsResponse {
-  statusCode?: string;
+  statusCode?: number;
   result?: {
     authorities?: { authority: string }[];
     role?: { roleName: string; permissions?: { permissionName: string; enabled: boolean }[] }[];

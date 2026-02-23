@@ -1,0 +1,105 @@
+{
+  "formId": "example-form",
+  "submitLabel": "Submit",
+  "sections": [
+    {
+      "id": "personal",
+      "title": "Personal details",
+      "fields": [
+        {
+          "name": "fullName",
+          "type": "text",
+          "label": "Full name",
+          "placeholder": "Enter name",
+          "required": true,
+          "requiredMessage": "Name is required",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        {
+          "name": "mobile",
+          "type": "text",
+          "label": "Mobile number",
+          "placeholder": "Enter mobile",
+          "subtype": "mobile",
+          "required": true,
+          "minLength": 10,
+          "maxLength": 12
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "label": "Email",
+          "placeholder": "email@example.com",
+          "required": true,
+          "pattern": {
+            "pattern": "^[^@]+@[^@]+\\.[^@]+$",
+            "message": "Invalid email"
+          }
+        },
+        {
+          "name": "notes",
+          "type": "textArea",
+          "label": "Notes",
+          "rows": 4,
+          "placeholder": "Optional notes"
+        }
+      ]
+    },
+    {
+      "id": "preferences",
+      "title": "Preferences",
+      "columns": 2,
+      "fields": [
+        {
+          "name": "country",
+          "type": "dropdown",
+          "label": "Country",
+          "placeholder": "Select country",
+          "mode": "single",
+          "options": [
+            { "value": "ng", "label": "Nigeria" },
+            { "value": "ke", "label": "Kenya" },
+            { "value": "gh", "label": "Ghana" }
+          ]
+        },
+        {
+          "name": "amount",
+          "type": "currency",
+          "label": "Amount",
+          "currency": "KES",
+          "minValue": 0,
+          "maxValue": 1000000
+        },
+        {
+          "name": "dob",
+          "type": "date",
+          "label": "Date of birth"
+        },
+        {
+          "name": "agree",
+          "type": "checkbox",
+          "label": "Terms",
+          "checkboxLabel": "I agree to the terms"
+        }
+      ]
+    },
+    {
+      "id": "upload",
+      "title": "Upload",
+      "fields": [
+        {
+          "name": "attachment",
+          "type": "file",
+          "label": "Attachment",
+          "multiple": false,
+          "dragDrop": true,
+          "showPreview": true,
+          "allowRemove": true,
+          "maxSize": 5242880,
+          "allowedTypes": ["image/*", "application/pdf"]
+        }
+      ]
+    }
+  ]
+}
