@@ -174,6 +174,9 @@ export interface FormLayoutConfig {
   submitLabel?: string;
 }
 
+/** Form state: field name -> value */
+export type FormValues = Record<string, unknown>;
+
 /** Props passed to every registered field component */
 export interface FieldComponentProps<T = unknown> {
   name: string;

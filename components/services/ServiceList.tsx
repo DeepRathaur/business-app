@@ -11,10 +11,10 @@ interface ServiceListProps {
 }
 
 export default function ServiceList({ items }: ServiceListProps) {
-  const { toLineDetails } = useInterModuleNavigation();
+  // const { toLineDetails } = useInterModuleNavigation();
 
   const handleMobileCheck = (mobile: string) => {
-    toLineDetails(mobile);
+    // toLineDetails(mobile);
   };
 
   return (

@@ -3,10 +3,10 @@
  * Centralized validation and error state. Used by FormRenderer and fields.
  */
 
-import type { FieldConfig, FormLayoutConfig } from "../types";
+import type { FieldConfig, FormLayoutConfig, FormValues } from "../types";
 import { runFieldValidators } from "./validators";
 
-export type FormValues = Record<string, unknown>;
+export type { FormValues };
 
 export interface ErrorHandlerResult {
   isValid: boolean;

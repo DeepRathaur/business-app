@@ -59,10 +59,10 @@ function DropdownFieldComponent({
   );
 
   const displayLabel = isMulti
-    ? (Array.isArray(current) ? current : [])
+    ? ((Array.isArray(current) ? current : [])
         .map((v) => options.find((o) => o.value === v)?.label ?? v)
-        .join(", ") || (cfg.placeholder ?? "Select...")
-    : options.find((o) => o.value === current)?.label ?? current || (cfg.placeholder ?? "Select...");
+        .join(", ") || (cfg.placeholder ?? "Select..."))
+    : (options.find((o) => o.value === current)?.label ?? current) || (cfg.placeholder ?? "Select...");
 
   const selectClass = cn(
     "mt-0 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-800 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 min-h-[44px]",

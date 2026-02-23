@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  transpilePackages: ["crypto-js"],
   async rewrites() {
     return [
       {

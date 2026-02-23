@@ -45,7 +45,7 @@ export default function LoginForm({
           label={t("USER_REGISTRATION.EMAILID")}
           theme="light"
           type="email"
-          placeholder="mohit1.test@example.com"
+          placeholder="enter your email"
           value={email}
           onChange={(e) => onEmailChange(e.target.value)}
           error={errors.email}

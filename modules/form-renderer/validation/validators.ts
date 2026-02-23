@@ -54,7 +54,7 @@ export function runFieldValidators(
   value: unknown,
   config: FieldConfig
 ): string | null {
-  const base = config as BaseFieldConfig & Record<string, unknown>;
+  const base = config as unknown as BaseFieldConfig & Record<string, unknown>;
   if (base.required) {
     const reqErr = requiredFail(value, config);
     if (reqErr) return reqErr;
@@ -66,21 +66,21 @@ export function runFieldValidators(
       if (err) return err;
     }
     if (base.minLength != null) {
-      const err = minLength(value, base.minLength, (base as LengthValidation).message);
+      const err = minLength(value, Number(base.minLength), (base as LengthValidation).message);
       if (err) return err;
     }
     if (base.maxLength != null) {
-      const err = maxLength(value, base.maxLength, (base as LengthValidation).message);
+      const err = maxLength(value, Number(base.maxLength), (base as LengthValidation).message);
       if (err) return err;
     }
     if (base.minValue != null || base.maxValue != null) {
       const range = base as unknown as RangeValidation;
       if (range.minValue != null) {
-        const err = minValue(value, range.minValue, range.message);
+        const err = minValue(value, Number(range.minValue), range.message);
         if (err) return err;
       }
       if (range.maxValue != null) {
-        const err = maxValue(value, range.maxValue, range.message);
+        const err = maxValue(value, Number(range.maxValue), range.message);
         if (err) return err;
       }
     }

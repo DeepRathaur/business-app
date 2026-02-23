@@ -3,7 +3,7 @@
  * Same secret derivation as Project B: navigator props + key for per-key encryption.
  */
 
-import CryptoJS from "crypto-js";
+import * as CryptoJS from "crypto-js";
 
 export class CryptoService {
   private encryptSecretKey: string;
@@ -43,5 +43,20 @@ export class CryptoService {
       console.error("CryptoService decryptData:", e);
     }
     return null;
+  }
+
+  /**
+   * Async encrypt for login payload (plain text string).
+   * Returns Promise so useLoginFlow can use cipher.encrypt(...).then(...)
+   */
+  encrypt(plainText: string): Promise<string> {
+    try {
+      const key = `${this.encryptSecretKey}?key=login`;
+      const encrypted = CryptoJS.AES.encrypt(plainText, key).toString();
+      return Promise.resolve(encrypted);
+    } catch (e) {
+      console.error("CryptoService encrypt:", e);
+      return Promise.reject(e);
+    }
   }
 }
